@@ -1,0 +1,236 @@
+body {
+    font-family: 'Assistant', sans-serif;
+    overscroll-behavior: none;
+}
+/* Each page is mounted on its own and fades in once it has the .active class */
+.step {
+    display: flex;
+    min-height: 100vh;
+    min-height: 100dvh;
+    opacity: 0;
+    transition: opacity 0.25s ease-in-out;
+    padding: clamp(1rem, 4vw, 2rem);
+}
+.step.active {
+    opacity: 1;
+}
+.title-pulse {
+    animation: pulse-text 2s infinite;
+}
+@keyframes pulse-text {
+    0%, 100% { text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #007bff; }
+    50% { text-shadow: 0 0 10px #fff, 0 0 20px #007bff, 0 0 30px #007bff; }
+}
+.btn-pulse {
+    animation: pulse-button 2s infinite;
+}
+@keyframes pulse-button {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(0,123,255,0.5); }
+    50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,123,255,1); }
+}
+.particle-canvas {
+    border: 2px solid #a7a7a7;
+    border-radius: 1rem;
+    background-color: #f0f8ff;
+    max-width: 100%;
+    height: auto;
+}
+.interactive-object {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
+    border: 4px solid transparent;
+    min-width: 0;
+    flex-shrink: 0;
+}
+.interactive-object:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 15px rgba(255, 255, 100, 0.7));
+}
+.interactive-object.active {
+     border-color: #facc15; /* yellow-400 */
+     transform: scale(1.05);
+}
+.mystery-note {
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+.mystery-note:hover {
+    transform: translateY(-5px) rotate(2deg);
+    box-shadow: 0 10px 15px rgba(0,0,0,0.15);
+}
+.answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.7s ease-in-out, padding 0.7s ease-in-out;
+    padding: 0 1rem;
+}
+.answer.visible {
+    max-height: 500px; /* Adjust as needed */
+    padding: 1rem;
+}
+
+#dabkesem-container {
+    touch-action: none;
+    width: min(24rem, 90vw);
+    height: min(24rem, 90vw);
+    max-width: 100%;
+    max-height: 100%;
+}
+
+#molecule-container-water, #molecule-container-oil {
+    touch-action: none;
+    width: min(20rem, 85vw);
+    height: min(20rem, 85vw);
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* Responsive typography */
+.responsive-title {
+    font-size: clamp(2rem, 8vw, 5rem);
+}
+.responsive-subtitle {
+    font-size: clamp(1.5rem, 6vw, 3rem);
+}
+.responsive-text {
+    font-size: clamp(1rem, 3vw, 1.25rem);
+}
+.responsive-large-text {
+    font-size: clamp(1.25rem, 4vw, 2rem);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .falling-apple {
+        font-size: clamp(2rem, 8vw, 3rem);
+    }
+
+    .intro-animation-icon {
+        font-size: clamp(3rem, 15vw, 5rem) !important;
+    }
+
+    .particle-canvas {
+        min-height: 200px;
+        height: clamp(200px, 40vh, 320px);
+    }
+
+    .step {
+        padding: clamp(0.5rem, 2vw, 1rem);
+    }
+}
+
+@media (max-width: 480px) {
+    .mystery-note:hover {
+        transform: translateY(-3px) rotate(1deg);
+    }
+
+    .interactive-object:hover {
+        transform: scale(1.05);
+    }
+}
+
+/* New animations for intro steps */
+@keyframes fall {
+  0% { top: 0%; transform: translateX(-50%) rotate(-30deg); }
+  100% { top: 300%; transform: translateX(-50%) rotate(360deg); }
+}
+.falling-apple {
+    position: absolute;
+    left: 50%;
+    animation: fall 2s ease-in forwards;
+    font-size: clamp(2rem, 8vw, 3rem);
+}
+
+.intro-animation-icon {
+    animation: subtle-pulse 3s infinite ease-in-out;
+}
+@keyframes subtle-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.05); opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 1.5s forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Step 7: heated tank */
+#particle-canvas-7 {
+    display: block;
+    width: 100%;
+    height: clamp(320px, min(64vw, 60vh), 520px);
+}
+
+/* Step 3: microscope eyepiece */
+#step-3-display {
+    --lens: clamp(230px, min(70vw, 42vh), 380px);
+    min-height: calc(var(--lens) + 2rem);
+    background: radial-gradient(circle at 50% 40%, #2b303a, #0b0d12);
+}
+#microscope-lens {
+    position: relative;
+    width: var(--lens);
+    height: var(--lens);
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    background: radial-gradient(circle, #fffef6 0%, #f1f3e6 55%, #d3d8c4 100%);
+    box-shadow: 0 0 0 6px #4b5563, 0 0 0 9px #111827, 0 0 40px rgba(250, 250, 200, 0.18);
+}
+#microscope-lens canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+}
+#particle-canvas-3 {
+    animation: lens-drift 7s ease-in-out infinite;
+}
+@keyframes lens-drift {
+    0%, 100% { transform: translate(-3px, 2px) scale(1.04); }
+    50% { transform: translate(3px, -2px) scale(1.04); }
+}
+#zoom-container svg {
+    width: 34%;
+    height: 34%;
+    will-change: transform, filter;
+}
+#lens-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 24%),
+        radial-gradient(circle, rgba(0, 0, 0, 0) 58%, rgba(0, 0, 0, 0.5) 100%);
+    box-shadow: inset 0 0 28px 6px rgba(0, 0, 0, 0.55);
+}
+#lens-overlay svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+#mag-readout {
+    position: absolute;
+    left: 50%;
+    bottom: 9%;
+    transform: translateX(-50%);
+    z-index: 6;
+    padding: 0.1rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #d9f99d;
+    font-family: ui-monospace, monospace;
+    font-size: clamp(0.75rem, 2.4vw, 1rem);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
