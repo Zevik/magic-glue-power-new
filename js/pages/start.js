@@ -2,14 +2,15 @@ export const slug = 'start';
 export const title = 'הכוח הנעלם';
 export const reinitOnResize = true;
 
-export const sectionClass = 'flex-col justify-center items-center text-center bg-gray-900 text-white';
+export const sectionClass = 'theme-start';
 
 export const html = `
-<div id="mysterious-orb-container" class="w-48 h-48 sm:w-64 sm:h-64 relative mb-4 sm:mb-8">
-    <canvas id="orb-canvas"></canvas>
+<div class="orb-wrap"><canvas id="orb-canvas"></canvas></div>
+<h1 class="title title-hero">הכוח הנעלם</h1>
+<p class="lead">מסע מדהים לעולם הגולות</p>
+<div class="actions">
+    <a href="#/gravity" class="btn btn-big btn-pulse">התחילו את המסע</a>
 </div>
-<h1 class="responsive-title font-bold mb-4" style="text-shadow: 0 0 10px #9333ea, 0 0 20px #9333ea;">הכוח הנעלם</h1>
-<a href="#/gravity" class="mt-4 sm:mt-8 px-6 py-3 sm:px-8 sm:py-4 bg-purple-600 font-bold text-lg sm:text-2xl rounded-full shadow-lg btn-pulse hover:bg-purple-700">התחילו את המסע</a>
 `;
 
 export function init(page) {

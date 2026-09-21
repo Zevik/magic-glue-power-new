@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#140a3a">
     <title>הכוח הנעלם: מסע לעולם הגולות</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="bg-gray-100 text-gray-800 overflow-x-hidden">
+<body>
+
+    <!-- One dot per page; each is a link to that page. Filled in by js/main.js -->
+    <nav id="progress" aria-label="התקדמות במסע"></nav>
 
     <!-- Each page of the journey is mounted here by js/main.js, at its own #/slug address -->
-    <div id="app-container" class="w-full"></div>
+    <div id="app-container"></div>
 
     <script type="module" src="js/main.js"></script>
 </body>

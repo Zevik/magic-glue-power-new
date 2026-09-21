@@ -1,28 +1,47 @@
 export const slug = 'summary';
 export const title = 'השמות האמיתיים';
 
-export const sectionClass = 'flex-col justify-center items-center text-center bg-gradient-to-br from-green-200 to-blue-300';
+export const sectionClass = 'theme-summary';
 
 export const html = `
- <h2 class="responsive-subtitle font-bold mb-4">השמות האמיתיים</h2>
-<p class="max-w-3xl mx-auto responsive-text mb-6 sm:mb-8 px-4">עברתם מסע מדהים וגיליתם את הסודות הגדולים ביותר של העולם! בואו נגלה לכם את השמות האמיתיים שהמדענים משתמשים בהם:</p>
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 w-full max-w-5xl px-4">
-    <div class="bg-white/70 p-4 sm:p-6 rounded-2xl shadow-lg text-center">
-        <p class="text-lg sm:text-xl lg:text-2xl mb-2">"כוח הדבקסם" הוא בעצם...</p>
-        <h3 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-500">הכוח האלקטרו-מגנטי</h3>
-     </div>
-    <div class="bg-white/70 p-4 sm:p-6 rounded-2xl shadow-lg text-center">
-        <p class="text-lg sm:text-xl lg:text-2xl mb-2">ה"גולות" שלנו הן בעצם...</p>
-        <h3 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-500">אטומים</h3>
+<span class="kicker">🏆 שלב 11</span>
+<h2 class="title">השמות האמיתיים</h2>
+<p class="lead">עברתם מסע מדהים וגיליתם את הסודות הגדולים ביותר של העולם! בואו נגלה לכם את השמות האמיתיים שהמדענים משתמשים בהם:</p>
+<div class="facts">
+    <div class="card fact" style="--f1: #fde047; --f2: #fb923c;">
+        <div class="icon">⚡</div>
+        <p>"כוח הדבקסם" הוא בעצם...</p>
+        <h3>הכוח האלקטרו-מגנטי</h3>
     </div>
-     <div class="bg-white/70 p-4 sm:p-6 rounded-2xl shadow-lg text-center">
-        <p class="text-lg sm:text-xl lg:text-2xl mb-2">ה"צורונים" שלנו הם בעצם...</p>
-        <h3 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-500">מולקולות</h3>
+    <div class="card fact" style="--f1: #fca5a5; --f2: #f472b6;">
+        <div class="icon">⚛️</div>
+        <p>ה"גולות" שלנו הן בעצם...</p>
+        <h3>אטומים</h3>
+    </div>
+    <div class="card fact" style="--f1: #93c5fd; --f2: #67e8f9;">
+        <div class="icon">🧪</div>
+        <p>ה"צורונים" שלנו הם בעצם...</p>
+        <h3>מולקולות</h3>
     </div>
 </div>
- <p class="max-w-3xl mx-auto responsive-text mt-6 sm:mt-8 px-4">עכשיו אתם לא רק יודעים איך העולם עובד, אתם גם יודעים לדבר כמו מדענים אמיתיים! תודה שהצטרפתם למסע!</p>
-<div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6 sm:mt-8 px-4">
-    <a href="#/mysteries" class="w-full sm:w-auto px-6 py-3 bg-gray-400 text-black font-bold text-lg sm:text-xl rounded-full shadow-md hover:bg-gray-500 transition-colors">חזרה</a>
-    <a href="#/start" class="w-full sm:w-auto px-6 py-3 sm:px-8 sm:py-4 bg-yellow-400 text-gray-900 font-bold text-lg sm:text-2xl rounded-full shadow-lg btn-pulse">לשחק שוב!</a>
+<p class="lead">עכשיו אתם לא רק יודעים איך העולם עובד, אתם גם יודעים לדבר כמו מדענים אמיתיים! תודה שהצטרפתם למסע!</p>
+<div class="actions">
+    <a href="#/mysteries" class="btn btn-ghost">חזרה</a>
+    <a href="#/start" class="btn btn-big btn-pulse">לשחק שוב!</a>
 </div>
 `;
+
+export function init(page) {
+    // A burst of confetti for finishing the journey
+    const pieces = ['🎉', '⭐', '🔵', '🟡', '🔴', '🟣', '🟢', '✨'];
+    for (let i = 0; i < 36; i++) {
+        const piece = document.createElement('span');
+        piece.className = 'confetti';
+        piece.textContent = pieces[i % pieces.length];
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.fontSize = `${1.1 + Math.random() * 1.2}rem`;
+        piece.style.animationDuration = `${3 + Math.random() * 3}s`;
+        piece.style.animationDelay = `${Math.random() * 2}s`;
+        page.root.appendChild(piece);
+    }
+}

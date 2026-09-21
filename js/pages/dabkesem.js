@@ -4,21 +4,22 @@ export const slug = 'dabkesem';
 export const title = 'כוח הדבקסם!';
 export const reinitOnResize = true;
 
-export const sectionClass = 'flex-col justify-center items-center text-center bg-green-200';
+export const sectionClass = 'theme-dabkesem';
 
 export const html = `
-<h2 class="responsive-subtitle font-bold mb-4">כוח הדבקסם!</h2>
-<p class="max-w-3xl mx-auto responsive-large-text mb-4 sm:mb-6 p-4 bg-black/10 rounded-xl">אבל למה הן נשארות יחד?</p>
-<p class="max-w-3xl mx-auto responsive-text mb-4 sm:mb-6 px-4">זה הזמן להכיר את "כוח הדבקסם". הוא מושך את כל הגולות אחת אל השנייה. נסו להפריד בין שתי הגולות!</p>
-<div id="dabkesem-container" class="relative bg-white rounded-2xl shadow-inner flex justify-center items-center cursor-grab mx-auto" style="background-image: radial-gradient(circle, #e0f2f1, #b2dfdb);">
-    <div id="dabkesem-line" class="absolute h-1 bg-teal-400 opacity-70" style="transform-origin: 0 50%;"></div>
-    <div id="gula1" class="absolute w-8 h-8 sm:w-12 sm:h-12 bg-red-500 rounded-full shadow-lg border-2 border-white"></div>
-    <div id="gula2" class="absolute w-8 h-8 sm:w-12 sm:h-12 bg-blue-500 rounded-full shadow-lg border-2 border-white"></div>
-    <p id="dabkesem-text" class="absolute bottom-2 sm:bottom-4 text-sm sm:text-lg font-semibold text-teal-800 opacity-0 transition-opacity px-2">מרגישים את המשיכה?</p>
+<span class="kicker">🧲 שלב 4</span>
+<h2 class="title">כוח הדבקסם!</h2>
+<p class="callout">אבל למה הן נשארות יחד?</p>
+<p class="lead">זה הזמן להכיר את "כוח הדבקסם". הוא מושך את כל הגולות אחת אל השנייה. נסו להפריד בין שתי הגולות!</p>
+<div id="dabkesem-container" class="pull-area">
+    <div id="dabkesem-line"></div>
+    <div id="gula1" class="gula"></div>
+    <div id="gula2" class="gula"></div>
+    <p id="dabkesem-text">מרגישים את המשיכה?</p>
 </div>
-<div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6 sm:mt-8 px-4">
-    <a href="#/microscope" class="w-full sm:w-auto px-6 py-3 bg-gray-400 text-black font-bold text-lg sm:text-xl rounded-full shadow-md hover:bg-gray-500 transition-colors">חזרה</a>
-    <a href="#/air" class="w-full sm:w-auto px-6 py-3 bg-green-500 text-white font-bold text-lg sm:text-xl rounded-full shadow-md hover:bg-green-600 transition-colors">הבנתי, אבל...</a>
+<div class="actions">
+    <a href="#/microscope" class="btn btn-ghost">חזרה</a>
+    <a href="#/air" class="btn">הבנתי, אבל...</a>
 </div>
 `;
 

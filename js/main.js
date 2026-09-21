@@ -5,6 +5,38 @@ const TITLE_SUFFIX = 'הכוח הנעלם: מסע לעולם הגולות';
 const FADE_MS = 250;
 
 const container = document.getElementById('app-container');
+const progress = document.getElementById('progress');
+
+// One dot per page, each a link to that page
+progress.innerHTML = pages.map(page => `<a href="#/${page.slug}" title="${page.title}" aria-label="${page.title}"></a>`).join('');
+
+function updateProgress(page) {
+    const index = pages.indexOf(page);
+    progress.classList.toggle('off', index === 0);
+    [...progress.children].forEach((dot, i) => {
+        dot.classList.toggle('current', i === index);
+        dot.classList.toggle('done', i < index);
+        if (i === index) dot.setAttribute('aria-current', 'page'); else dot.removeAttribute('aria-current');
+    });
+}
+
+// A few glass marbles floating behind the content of every page
+function makeDecoration() {
+    const deco = document.createElement('div');
+    deco.className = 'deco';
+    deco.setAttribute('aria-hidden', 'true');
+    for (let i = 0; i < 8; i++) {
+        const bubble = document.createElement('span');
+        bubble.className = 'bubble';
+        bubble.style.setProperty('--x', `${Math.round(Math.random() * 92)}%`);
+        bubble.style.setProperty('--y', `${Math.round(Math.random() * 92)}%`);
+        bubble.style.setProperty('--size', `${Math.round(24 + Math.random() * 70)}px`);
+        bubble.style.setProperty('--dur', `${(6 + Math.random() * 6).toFixed(1)}s`);
+        bubble.style.setProperty('--delay', `${(-Math.random() * 8).toFixed(1)}s`);
+        deco.appendChild(bubble);
+    }
+    return deco;
+}
 const bySlug = new Map(pages.map(page => [page.slug, page]));
 let current = null; // { page, root, context }
 let navigation = 0;
@@ -20,9 +52,11 @@ function mount(page) {
     root.id = `page-${page.slug}`;
     root.className = `step ${page.sectionClass}`;
     root.innerHTML = page.html;
+    root.prepend(makeDecoration());
     container.appendChild(root);
     window.scrollTo(0, 0);
     document.title = `${page.title} | ${TITLE_SUFFIX}`;
+    updateProgress(page);
 
     const context = createPageContext(root);
     current = { page, root, context };
@@ -65,31 +99,5 @@ window.addEventListener('resize', () => {
     }, 250);
 });
 
-// The pages are inserted dynamically and Tailwind (loaded from its CDN) writes the CSS for their
-// classes a moment later. A page that measures its layout right away would see unstyled elements,
-// so before showing anything, all the classes of all the pages are handed to Tailwind at once and
-// we wait until it has produced the CSS.
-async function waitForTailwind() {
-    const classLists = new Set();
-    for (const page of pages) {
-        classLists.add(page.sectionClass);
-        for (const match of page.html.matchAll(/class="([^"]*)"/g)) classLists.add(match[1]);
-    }
-
-    const holder = document.createElement('div');
-    holder.setAttribute('aria-hidden', 'true');
-    holder.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;visibility:hidden;pointer-events:none;';
-    holder.innerHTML = [...classLists].map(classes => `<i class="${classes}"></i>`).join('') +
-        '<div class="w-48"></div>'; // once this one has a width, the CSS is in
-    const probe = holder.lastChild;
-    document.body.appendChild(holder); // stays, so Tailwind keeps the classes it generated
-
-    const start = performance.now();
-    while (getComputedStyle(probe).width !== '192px' && performance.now() - start < 3000) {
-        await new Promise(resolve => setTimeout(resolve, 16));
-    }
-}
-
-await waitForTailwind();
 window.addEventListener('hashchange', route);
 route();

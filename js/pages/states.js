@@ -1,26 +1,28 @@
 import { smoothstep } from '../lib/util.js';
+import { marbleSprite, drawMarble } from '../lib/marble-sprite.js';
 
 export const slug = 'states';
 export const title = 'מסיבת הגולות הגדולה!';
 export const reinitOnResize = () => step7SizeChanged();
 
-export const sectionClass = 'flex-col justify-center items-center text-center bg-sky-200';
+export const sectionClass = 'theme-states';
 
 export const html = `
-<h2 class="responsive-subtitle font-bold mb-4">מסיבת הגולות הגדולה!</h2>
-<p class="max-w-3xl mx-auto responsive-text mb-2 sm:mb-4 px-4">עכשיו נראה איך הכל מתחבר ביחד. לפנינו מיכל מלא בגולות של מים. גררו את מד הטמפרטורה כדי להגביר את הלהבה שמתחת למיכל ולחמם את הגולות, ואז לקרר אותן שוב! שימו לב לחור הקטן בראש המיכל.</p>
-<div class="w-full max-w-2xl bg-white p-3 sm:p-4 rounded-xl shadow-lg mx-auto">
-    <canvas id="particle-canvas-7" class="particle-canvas w-full mx-auto"></canvas>
-    <div class="flex items-center justify-center w-full mt-4">
-        <span class="text-2xl sm:text-3xl">❄️</span>
-        <input id="temp-slider-7" type="range" min="0" max="100" value="10" class="w-full mx-2 sm:mx-4 accent-red-500">
-        <span class="text-2xl sm:text-3xl">☀️</span>
+<span class="kicker">🧊 שלב 7</span>
+<h2 class="title">מסיבת הגולות הגדולה!</h2>
+<p class="lead">עכשיו נראה איך הכל מתחבר ביחד. לפנינו מיכל מלא בגולות של מים. גררו את מד הטמפרטורה כדי להגביר את הלהבה שמתחת למיכל ולחמם את הגולות, ואז לקרר אותן שוב! שימו לב לחור הקטן בראש המיכל.</p>
+<div class="card tank-card">
+    <canvas id="particle-canvas-7"></canvas>
+    <div class="slider-row">
+        <span class="emoji">❄️</span>
+        <input id="temp-slider-7" type="range" min="0" max="100" value="10" class="temp-slider" aria-label="טמפרטורה">
+        <span class="emoji">☀️</span>
     </div>
-    <p id="state-explanation" class="mt-4 text-lg sm:text-xl font-bold min-h-[3rem] sm:min-h-[4rem] flex items-center justify-center text-center"></p>
+    <p id="state-explanation" class="state-chip"></p>
 </div>
-<div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6 sm:mt-8 px-4">
-    <a href="#/heat" class="w-full sm:w-auto px-6 py-3 bg-gray-400 text-black font-bold text-lg sm:text-xl rounded-full shadow-md hover:bg-gray-500 transition-colors">חזרה</a>
-    <a href="#/tsuronim" class="w-full sm:w-auto px-6 py-3 bg-sky-500 text-white font-bold text-lg sm:text-xl rounded-full shadow-md hover:bg-sky-600 transition-colors">הבנתי, מה זה צורון?</a>
+<div class="actions">
+    <a href="#/heat" class="btn btn-ghost">חזרה</a>
+    <a href="#/tsuronim" class="btn">הבנתי, מה זה צורון?</a>
 </div>
 `;
 
@@ -42,7 +44,7 @@ export function init(page) {
     const MELT_FROM = 34, MELT_TO = 40;   // slider range where the ice lets go
     const BOIL_FROM = 58, BOIL_TO = 68;   // slider range where the water starts boiling away
     const MODE_SOLID = 0, MODE_FREE = 1, MODE_FREEZING = 2;
-    const SHADES = ['hsl(200, 80%, 50%)', 'hsl(200, 80%, 56%)', 'hsl(200, 80%, 62%)', 'hsl(200, 80%, 68%)'];
+    const SHADE_LIGHTNESS = [44, 50, 56, 62]; // water blue, a few tones so the marbles are not identical
 
     let W, H, r, tank, hole, bounds, flameRoom;
     let particles = [];
@@ -51,6 +53,7 @@ export function init(page) {
     const grid = { cell: 0, w: 0, h: 0, head: null, next: null };
     let flameTime = 0;
     let lastState = '';
+    let sprites = [];
 
     function setup() {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -66,6 +69,7 @@ export function init(page) {
         flameRoom = Math.max(58, H * 0.16);
         tank = { x: W * 0.04, y: headroom, w: W * 0.92, h: H - headroom - flameRoom };
         r = Math.min(7, Math.max(3.5, W / 70));
+        sprites = SHADE_LIGHTNESS.map(lightness => marbleSprite(198, 90, lightness, r, dpr));
         minD = r * 1.85;
         cohesionD = r * 2.7;
 
@@ -100,7 +104,7 @@ export function init(page) {
                     fade: 1,
                     // The bottom (closest to the flame) lets go first
                     meltAt: MELT_FROM + (MELT_TO - MELT_FROM) * (0.6 * Math.random() + 0.4 * (1 - heightFrac)),
-                    shade: Math.floor(Math.random() * SHADES.length)
+                    shade: Math.floor(Math.random() * SHADE_LIGHTNESS.length)
                 });
             }
         }
@@ -339,7 +343,10 @@ export function init(page) {
 
     function drawTank(heat) {
         tankPath();
-        ctx.fillStyle = '#ffffff';
+        const glass = ctx.createLinearGradient(0, tank.y, 0, tank.y + tank.h);
+        glass.addColorStop(0, 'rgba(255, 255, 255, 0.16)');
+        glass.addColorStop(1, 'rgba(255, 255, 255, 0.06)');
+        ctx.fillStyle = glass;
         ctx.fill();
         const tint = ctx.createLinearGradient(0, tank.y, 0, tank.y + tank.h);
         tint.addColorStop(0.55, 'rgba(255, 140, 40, 0)');
@@ -353,7 +360,7 @@ export function init(page) {
         ctx.lineWidth = 4;
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
-        ctx.strokeStyle = '#6b7280';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
         ctx.beginPath();
         ctx.moveTo(hole.x1, y);
         ctx.lineTo(x + w - rad, y);
@@ -369,33 +376,16 @@ export function init(page) {
     }
 
     function drawParticles() {
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = 'rgba(0, 70, 130, 0.35)';
-        for (let s = 0; s < SHADES.length; s++) {
-            ctx.fillStyle = SHADES[s];
-            ctx.beginPath();
-            for (const p of particles) {
-                if (p.escaped || p.fade < 1 || p.shade !== s) continue;
-                ctx.moveTo(p.x + r, p.y);
-                ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-            }
-            ctx.fill();
-            ctx.stroke();
-        }
-        // Marbles that are dripping back in through the hole fade in
-        ctx.fillStyle = SHADES[2];
         for (const p of particles) {
-            if (p.escaped || p.fade >= 1) continue;
-            ctx.globalAlpha = p.fade;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-            ctx.fill();
+            if (p.escaped) continue;
+            if (p.fade < 1) ctx.globalAlpha = p.fade; // marbles dripping back in through the hole fade in
+            drawMarble(ctx, sprites[p.shade], p.x, p.y, r);
+            if (p.fade < 1) ctx.globalAlpha = 1;
         }
-        ctx.globalAlpha = 1;
     }
 
     function drawSteam() {
-        ctx.fillStyle = 'rgb(176, 214, 240)';
+        ctx.fillStyle = 'rgb(226, 240, 255)';
         for (const s of steam) {
             ctx.globalAlpha = s.life * 0.7;
             ctx.beginPath();
@@ -406,15 +396,15 @@ export function init(page) {
     }
 
     function updateExplanation(t) {
-        let key, text, color;
-        if (t < MELT_FROM) { key = 'solid'; text = 'זהו מצב מוצק! (קרח)'; color = 'text-blue-600'; }
-        else if (t < MELT_TO) { key = 'melting'; text = 'הרעידות מתגברות והקרח מתחיל להימס!'; color = 'text-orange-600'; }
-        else if (t < 62) { key = 'liquid'; text = 'הקרח נמס! זהו מצב נוזל. (מים)'; color = 'text-cyan-600'; }
-        else { key = 'gas'; text = 'המים רותחים! זהו מצב גז. (אדים)'; color = 'text-gray-600'; }
+        let key, text;
+        if (t < MELT_FROM) { key = 'solid'; text = '🧊 זהו מצב מוצק! (קרח)'; }
+        else if (t < MELT_TO) { key = 'melting'; text = '🫨 הרעידות מתגברות והקרח מתחיל להימס!'; }
+        else if (t < 62) { key = 'liquid'; text = '💧 הקרח נמס! זהו מצב נוזל. (מים)'; }
+        else { key = 'gas'; text = '♨️ המים רותחים! זהו מצב גז. (אדים)'; }
         if (key === lastState) return;
         lastState = key;
         explanation.textContent = text;
-        explanation.className = `mt-4 text-lg sm:text-xl font-bold min-h-[3rem] sm:min-h-[4rem] flex items-center justify-center text-center ${color}`;
+        explanation.className = `state-chip state-${key}`;
     }
 
     setup();

@@ -1,176 +1,386 @@
-body {
-    font-family: 'Assistant', sans-serif;
-    overscroll-behavior: none;
+/* ==========================================================================
+   Design system: "the marble lab"
+   Saturated gradient worlds, glass panels, glossy marbles, chunky buttons.
+   ========================================================================== */
+
+:root {
+    --font: 'Rubik', 'Assistant', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --glass: rgba(255, 255, 255, 0.14);
+    --glass-strong: rgba(255, 255, 255, 0.24);
+    --glass-line: rgba(255, 255, 255, 0.34);
+    --accent: #ffd23f;
+    --radius: 1.6rem;
+    --shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
 }
-/* Each page is mounted on its own and fades in once it has the .active class */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+    margin: 0;
+    font-family: var(--font);
+    font-size: 1.125rem;
+    color: #fff;
+    background: #0b1020;
+    overflow-x: hidden;
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; }
+
+.hidden { display: none !important; }
+.cursor-grabbing { cursor: grabbing !important; }
+
+/* ---------- Page shell ---------- */
+
 .step {
+    position: relative;
     display: flex;
-    overflow-x: clip; /* nothing on a page may widen it, mobile browsers would zoom out to fit */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     min-height: 100vh;
     min-height: 100dvh;
+    padding: 4.25rem clamp(1rem, 4vw, 2rem) 2.5rem;
+    text-align: center;
+    background: linear-gradient(160deg, var(--c1), var(--c2));
+    overflow: clip; /* the glows and the marbles are cut at the page edge, so they can never make it wider or taller (mobile browsers would zoom out to fit) */
     opacity: 0;
-    transition: opacity 0.25s ease-in-out;
-    padding: clamp(1rem, 4vw, 2rem);
+    transform: translateY(14px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
-.step.active {
-    opacity: 1;
+.step.active { opacity: 1; transform: none; }
+
+/* soft coloured light in two corners */
+.step::before,
+.step::after {
+    content: '';
+    position: absolute;
+    width: 70vmax;
+    height: 70vmax;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--glow) 0%, transparent 62%);
+    opacity: 0.32;
+    pointer-events: none;
+    animation: drift 16s ease-in-out infinite alternate;
 }
-.title-pulse {
-    animation: pulse-text 2s infinite;
+.step::before { top: -35vmax; inset-inline-start: -30vmax; }
+.step::after { bottom: -38vmax; inset-inline-end: -30vmax; animation-delay: -8s; opacity: 0.22; }
+
+@keyframes drift {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(6vmax, 4vmax) scale(1.12); }
 }
-@keyframes pulse-text {
-    0%, 100% { text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #007bff; }
-    50% { text-shadow: 0 0 10px #fff, 0 0 20px #007bff, 0 0 30px #007bff; }
+
+.step > *:not(.deco) { position: relative; z-index: 1; }
+
+/* floating glass marbles in the background */
+.deco { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.bubble {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 26%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.16) 34%, rgba(255, 255, 255, 0.05) 70%);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    opacity: 0.65;
+    animation: floaty var(--dur) ease-in-out infinite;
+    animation-delay: var(--delay);
 }
-.btn-pulse {
-    animation: pulse-button 2s infinite;
+@keyframes floaty {
+    0%, 100% { transform: translateY(0) translateX(0); }
+    50% { transform: translateY(-28px) translateX(10px); }
 }
+
+/* one colour world per page */
+.theme-start { --c1: #140a3a; --c2: #4c1d95; --glow: #c084fc; }
+.theme-gravity { --c1: #0369a1; --c2: #15803d; --glow: #bef264; }
+.theme-invisible-force { --c1: #3730a3; --c2: #a21caf; --glow: #f0abfc; }
+.theme-microscope { --c1: #0b1226; --c2: #1e3a5f; --glow: #22d3ee; }
+.theme-dabkesem { --c1: #0f766e; --c2: #166534; --glow: #5eead4; }
+.theme-air { --c1: #0e7490; --c2: #4338ca; --glow: #67e8f9; }
+.theme-heat { --c1: #c2410c; --c2: #9f1239; --glow: #fdba74; }
+.theme-states { --c1: #0369a1; --c2: #4338ca; --glow: #7dd3fc; }
+.theme-tsuronim { --c1: #7e22ce; --c2: #be185d; --glow: #f9a8d4; }
+.theme-attraction { --c1: #5b21b6; --c2: #be123c; --glow: #fda4af; }
+.theme-mysteries { --c1: #b45309; --c2: #9f1239; --glow: #fde68a; }
+.theme-summary { --c1: #047857; --c2: #1d4ed8; --glow: #a7f3d0; }
+
+/* ---------- Progress dots (each one is a link to its page) ---------- */
+
+#progress {
+    position: fixed;
+    top: 0.7rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+    padding: 0.2rem 0.45rem;
+    border-radius: 999px;
+    background: rgba(10, 12, 30, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: opacity 0.3s;
+}
+#progress.off { opacity: 0; pointer-events: none; }
+#progress a { display: block; padding: 0.5rem 0.22rem; }
+#progress a::before {
+    content: '';
+    display: block;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.35);
+    transition: width 0.3s, background 0.3s;
+}
+#progress a.done::before { background: rgba(255, 255, 255, 0.85); }
+#progress a.current::before { width: 1.7rem; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+/* ---------- Typography ---------- */
+
+.kicker {
+    display: inline-block;
+    margin-bottom: 0.7rem;
+    padding: 0.25rem 1rem;
+    border-radius: 999px;
+    background: var(--glass);
+    border: 1px solid var(--glass-line);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.title {
+    font-size: clamp(2.2rem, 8vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    text-shadow: 0 4px 0 rgba(0, 0, 0, 0.18), 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+.title-hero {
+    font-size: clamp(3rem, 14vw, 6.5rem);
+    font-weight: 900;
+    background: linear-gradient(90deg, #fff, #e9d5ff 45%, #fbcfe8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: none;
+    filter: drop-shadow(0 0 22px rgba(192, 132, 252, 0.75));
+    animation: glow-breath 3s ease-in-out infinite;
+}
+@keyframes glow-breath {
+    0%, 100% { filter: drop-shadow(0 0 14px rgba(192, 132, 252, 0.6)); }
+    50% { filter: drop-shadow(0 0 30px rgba(216, 180, 254, 0.95)); }
+}
+
+.lead {
+    max-width: 44rem;
+    margin: 0 auto 1.2rem;
+    font-size: clamp(1.25rem, 3.8vw, 1.65rem);
+    font-weight: 500;
+    line-height: 1.55;
+    text-wrap: balance;
+}
+.lead b, .callout b { font-weight: 800; color: var(--accent); }
+
+.callout {
+    max-width: 44rem;
+    margin: 0 auto 1.2rem;
+    padding: 1.1rem 1.6rem;
+    border-radius: var(--radius);
+    background: var(--glass);
+    border: 2px solid var(--glass-line);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    font-size: clamp(1.35rem, 4.2vw, 1.9rem);
+    font-weight: 700;
+    line-height: 1.4;
+    box-shadow: var(--shadow);
+}
+.callout-soft { font-size: clamp(1.15rem, 3.6vw, 1.5rem); font-weight: 500; line-height: 1.6; }
+
+.card {
+    padding: 1.2rem 1.4rem;
+    border-radius: var(--radius);
+    background: var(--glass);
+    border: 2px solid var(--glass-line);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: var(--shadow);
+}
+
+/* ---------- Buttons ---------- */
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    margin-top: 1.8rem;
+}
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.5rem;
+    padding: 0.7rem 2rem;
+    border: 0;
+    border-radius: 999px;
+    font: 800 1.25rem/1.2 var(--font);
+    color: #2a1a05;
+    background: linear-gradient(180deg, #ffe66d, #ffb627);
+    box-shadow: 0 6px 0 #b8760a, 0 14px 24px rgba(0, 0, 0, 0.32);
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #b8760a, 0 6px 12px rgba(0, 0, 0, 0.3); }
+.btn-ghost {
+    color: #fff;
+    background: var(--glass-strong);
+    box-shadow: inset 0 0 0 2px var(--glass-line), 0 10px 20px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+.btn-ghost:active { box-shadow: inset 0 0 0 2px var(--glass-line), 0 2px 6px rgba(0, 0, 0, 0.2); }
+.btn-big { min-height: 4.2rem; padding: 1rem 2.6rem; font-size: clamp(1.4rem, 4.4vw, 1.9rem); }
+.btn-pulse { animation: pulse-button 2s infinite; }
 @keyframes pulse-button {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(0,123,255,0.5); }
-    50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,123,255,1); }
-}
-.particle-canvas {
-    border: 2px solid #a7a7a7;
-    border-radius: 1rem;
-    background-color: #f0f8ff;
-    max-width: 100%;
-    height: auto;
-}
-.interactive-object {
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
-    border: 4px solid transparent;
-    min-width: 0;
-    flex-shrink: 0;
-}
-.interactive-object:hover {
-    transform: scale(1.1);
-    filter: drop-shadow(0 0 15px rgba(255, 255, 100, 0.7));
-}
-.interactive-object.active {
-     border-color: #facc15; /* yellow-400 */
-     transform: scale(1.05);
-}
-.mystery-note {
-    transition: transform 0.3s, box-shadow 0.3s;
-    cursor: pointer;
-}
-.mystery-note:hover {
-    transform: translateY(-5px) rotate(2deg);
-    box-shadow: 0 10px 15px rgba(0,0,0,0.15);
-}
-.answer {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.7s ease-in-out, padding 0.7s ease-in-out;
-    padding: 0 1rem;
-}
-.answer.visible {
-    max-height: 500px; /* Adjust as needed */
-    padding: 1rem;
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
-#dabkesem-container {
-    touch-action: none;
-    width: min(24rem, 90vw);
-    height: min(24rem, 90vw);
-    max-width: 100%;
-    max-height: 100%;
+@media (max-width: 640px) {
+    .actions { flex-direction: column-reverse; align-items: center; }
+    .actions .btn { width: 100%; max-width: 22rem; }
 }
 
-#molecule-container-water, #molecule-container-oil {
-    touch-action: none;
-    width: min(20rem, 85vw);
-    height: min(20rem, 85vw);
-    max-width: 100%;
-    max-height: 100%;
-}
+/* ---------- Page 0: start ---------- */
 
-/* Responsive typography */
-.responsive-title {
-    font-size: clamp(2rem, 8vw, 5rem);
-}
-.responsive-subtitle {
-    font-size: clamp(1.5rem, 6vw, 3rem);
-}
-.responsive-text {
-    font-size: clamp(1rem, 3vw, 1.25rem);
-}
-.responsive-large-text {
-    font-size: clamp(1.25rem, 4vw, 2rem);
-}
+.orb-wrap { width: min(16rem, 62vw); height: min(16rem, 62vw); margin-bottom: 0.5rem; }
+.orb-wrap canvas { display: block; width: 100%; height: 100%; }
 
-/* Mobile optimizations */
-@media (max-width: 768px) {
-    .falling-apple {
-        font-size: clamp(2rem, 8vw, 3rem);
-    }
+/* ---------- Page 1: gravity ---------- */
 
-    .intro-animation-icon {
-        font-size: clamp(3rem, 15vw, 5rem) !important;
-    }
-
-    .particle-canvas {
-        min-height: 200px;
-        height: clamp(200px, 40vh, 320px);
-    }
-
-    .step {
-        padding: clamp(0.5rem, 2vw, 1rem);
-    }
-}
-
-@media (max-width: 480px) {
-    .mystery-note:hover {
-        transform: translateY(-3px) rotate(1deg);
-    }
-
-    .interactive-object:hover {
-        transform: scale(1.05);
-    }
-}
-
-/* New animations for intro steps */
-@keyframes fall {
-  0% { top: 0%; transform: translateX(-50%) rotate(-30deg); }
-  100% { top: 300%; transform: translateX(-50%) rotate(360deg); }
-}
+.apple-drop { position: relative; width: 10rem; height: 10rem; margin: 0.6rem auto 1.2rem; }
+.apple-drop canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .falling-apple {
     position: absolute;
     left: 50%;
     animation: fall 2s ease-in forwards;
-    font-size: clamp(2rem, 8vw, 3rem);
+    font-size: clamp(3rem, 10vw, 4rem);
 }
+@keyframes fall {
+    0% { top: 0%; transform: translateX(-50%) rotate(-30deg); }
+    100% { top: 300%; transform: translateX(-50%) rotate(360deg); }
+}
+.fade-in { animation: fadeIn 1.5s forwards; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-.intro-animation-icon {
+/* ---------- Page 2: invisible force ---------- */
+
+.icon-row { display: flex; justify-content: center; gap: clamp(0.8rem, 3vw, 1.6rem); margin: 0.6rem 0 1.4rem; }
+.icon-tile {
+    display: grid;
+    place-items: center;
+    width: clamp(5rem, 22vw, 7rem);
+    height: clamp(5rem, 22vw, 7rem);
+    border-radius: 1.8rem;
+    background: var(--glass);
+    border: 2px solid var(--glass-line);
+    font-size: clamp(2.6rem, 11vw, 4rem);
+    box-shadow: var(--shadow);
     animation: subtle-pulse 3s infinite ease-in-out;
 }
+.icon-tile:nth-child(2) { animation-delay: 1s; }
+.icon-tile:nth-child(3) { animation-delay: 2s; }
 @keyframes subtle-pulse {
-    0%, 100% { transform: scale(1); opacity: 0.9; }
-    50% { transform: scale(1.05); opacity: 1; }
+    0%, 100% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.06) translateY(-6px); }
 }
 
-.fade-in {
-    animation: fadeIn 1.5s forwards;
-}
+/* ---------- Glossy marbles made of divs ---------- */
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.marble {
+    position: absolute;
+    border-radius: 50%;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
 }
+.m-red { background: radial-gradient(circle at 32% 28%, #ffb4b4, #ef4444 52%, #7f1d1d); }
+.m-white { background: radial-gradient(circle at 32% 28%, #fff, #e5e7eb 50%, #9ca3af); }
+.m-dark { background: radial-gradient(circle at 32% 28%, #9ca3af, #374151 50%, #030712); }
+.m-light { background: radial-gradient(circle at 32% 28%, #fff, #d1d5db 55%, #6b7280); }
+.m-blue { background: radial-gradient(circle at 32% 28%, #bfdbfe, #3b82f6 52%, #1e3a8a); }
+.m-green { background: radial-gradient(circle at 32% 28%, #bbf7d0, #22c55e 52%, #14532d); }
 
-/* Step 7: heated tank */
-#particle-canvas-7 {
-    display: block;
+/* ---------- Page 3: microscope ---------- */
+
+.lab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.4rem;
     width: 100%;
-    height: clamp(320px, min(64vw, 60vh), 520px);
+    max-width: 62rem;
 }
+@media (min-width: 900px) { .lab { flex-direction: row; align-items: center; justify-content: center; gap: 3rem; } }
 
-/* Step 3: microscope eyepiece */
-#step-3-display {
-    --lens: clamp(230px, min(70vw, 42vh), 380px);
-    min-height: calc(var(--lens) + 2rem);
-    background: radial-gradient(circle at 50% 40%, #2b303a, #0b0d12);
+.tray {
+    display: flex;
+    flex-direction: row;
+    gap: 0.9rem;
+    padding: 0.9rem;
+    border-radius: var(--radius);
+    background: var(--glass);
+    border: 2px solid var(--glass-line);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+@media (min-width: 900px) { .tray { flex-direction: column; } }
+
+.interactive-object {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.7rem 0.9rem;
+    min-width: 5.6rem;
+    border-radius: 1.2rem;
+    background: rgba(255, 255, 255, 0.92);
+    color: #1e293b;
+    border: 4px solid transparent;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: transform 0.25s ease, border-color 0.25s, box-shadow 0.25s;
+}
+.interactive-object svg { width: clamp(4rem, 15vw, 5.4rem); height: clamp(4rem, 15vw, 5.4rem); }
+.interactive-object span { font-size: 1.15rem; font-weight: 800; }
+.interactive-object:hover { transform: translateY(-4px) scale(1.05); }
+.interactive-object.active { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(255, 210, 63, 0.35), 0 8px 18px rgba(0, 0, 0, 0.25); }
+.interactive-object.dragging { opacity: 0.35; transform: none; }
+
+.scope {
+    --lens: clamp(240px, min(80vw, 46vh), 400px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 32rem;
 }
 #microscope-lens {
     position: relative;
@@ -180,29 +390,22 @@ body {
     border-radius: 50%;
     overflow: hidden;
     background: radial-gradient(circle, #fffef6 0%, #f1f3e6 55%, #d3d8c4 100%);
-    box-shadow: 0 0 0 6px #4b5563, 0 0 0 9px #111827, 0 0 40px rgba(250, 250, 200, 0.18);
+    box-shadow: 0 0 0 6px #64748b, 0 0 0 11px #0f172a, 0 0 70px rgba(34, 211, 238, 0.45);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
-#microscope-lens canvas {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-    border-radius: 0;
-    background: transparent;
+#microscope-lens.drop-ready {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 6px #facc15, 0 0 0 11px #0f172a, 0 0 80px rgba(250, 204, 21, 0.85);
 }
-#particle-canvas-3 {
-    animation: lens-drift 7s ease-in-out infinite;
-}
+#microscope-lens canvas { position: absolute; inset: 0; width: 100%; height: 100%; border: none; border-radius: 0; background: transparent; }
+#fog-canvas { display: block; }
+#particle-canvas-3 { animation: lens-drift 7s ease-in-out infinite; }
 @keyframes lens-drift {
     0%, 100% { transform: translate(-3px, 2px) scale(1.04); }
     50% { transform: translate(3px, -2px) scale(1.04); }
 }
-#zoom-container svg {
-    width: 34%;
-    height: 34%;
-    will-change: transform, filter;
-}
+#zoom-container { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; }
+#zoom-container svg { width: 34%; height: 34%; will-change: transform, filter; }
 #lens-overlay {
     position: absolute;
     inset: 0;
@@ -214,39 +417,40 @@ body {
         radial-gradient(circle, rgba(0, 0, 0, 0) 58%, rgba(0, 0, 0, 0.5) 100%);
     box-shadow: inset 0 0 28px 6px rgba(0, 0, 0, 0.55);
 }
-#lens-overlay svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-}
+#lens-overlay svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 #mag-readout {
     position: absolute;
     left: 50%;
     bottom: 9%;
     transform: translateX(-50%);
     z-index: 6;
-    padding: 0.1rem 0.7rem;
+    padding: 0.15rem 0.9rem;
     border-radius: 999px;
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(0, 0, 0, 0.62);
     color: #d9f99d;
     font-family: ui-monospace, monospace;
-    font-size: clamp(0.75rem, 2.4vw, 1rem);
+    font-size: clamp(0.95rem, 3vw, 1.2rem);
+    font-weight: 700;
     letter-spacing: 0.05em;
     white-space: nowrap;
 }
-
-/* Step 3: dragging specimens onto the microscope */
-#step-3-objects .interactive-object {
-    cursor: grab;
-    touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
-}
-#step-3-objects .interactive-object.dragging {
-    opacity: 0.35;
-    transform: none;
-    filter: none;
+#lens-hint {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: max-content;
+    top: 20%;
+    z-index: 6;
+    padding: 0.2rem 1rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: clamp(1rem, 3.2vw, 1.2rem);
+    font-weight: 700;
+    white-space: nowrap;
+    pointer-events: none;
+    animation: subtle-pulse 2.5s infinite ease-in-out;
 }
 .drag-ghost {
     position: fixed;
@@ -258,29 +462,218 @@ body {
     transform-origin: 0 0;
     filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.4));
 }
-#microscope-lens {
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+#particle-explanation { width: 100%; margin: 0; }
+
+/* ---------- Page 4: pulling two marbles ---------- */
+
+/* no box: just a soft glow to show where the marbles live */
+.pull-area, .mol-area {
+    position: relative;
+    margin: 0.6rem auto;
+    touch-action: none;
+    cursor: grab;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 62%);
 }
-#microscope-lens.drop-ready {
-    transform: scale(1.04);
-    box-shadow: 0 0 0 6px #facc15, 0 0 0 9px #111827, 0 0 50px rgba(250, 204, 21, 0.75);
-}
-#lens-hint {
+.pull-area { width: min(26rem, 92vw); height: min(26rem, 92vw); }
+.gula {
     position: absolute;
+    width: clamp(3.4rem, 13vw, 4.6rem);
+    height: clamp(3.4rem, 13vw, 4.6rem);
+    border-radius: 50%;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35), 0 0 22px var(--gula-glow);
+}
+#gula1 { --gula-glow: rgba(248, 113, 113, 0.7); background: radial-gradient(circle at 32% 28%, #fecaca, #ef4444 50%, #7f1d1d); }
+#gula2 { --gula-glow: rgba(96, 165, 250, 0.7); background: radial-gradient(circle at 32% 28%, #bfdbfe, #3b82f6 50%, #1e3a8a); }
+#dabkesem-line {
+    position: absolute;
+    height: 0.4rem;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #fde047, #f0abfc);
+    box-shadow: 0 0 14px rgba(253, 224, 71, 0.9);
+    transform-origin: 0 50%;
+}
+#dabkesem-text {
+    position: absolute;
+    bottom: 0.4rem;
     left: 0;
     right: 0;
-    margin: 0 auto;
-    width: max-content;
-    top: 20%;
-    z-index: 6;
-    padding: 0.15rem 0.8rem;
-    border-radius: 999px;
-    background: rgba(0, 0, 0, 0.45);
-    color: #fff;
-    font-size: clamp(0.8rem, 2.6vw, 1rem);
-    font-weight: 700;
-    white-space: nowrap;
+    padding: 0 0.5rem;
+    font-size: clamp(1.3rem, 4.6vw, 1.8rem);
+    font-weight: 800;
+    color: var(--accent);
+    text-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transition: opacity 0.25s;
     pointer-events: none;
-    animation: subtle-pulse 2.5s infinite ease-in-out;
-    transition: opacity 0.3s;
+}
+
+/* ---------- Pages 5-7: canvases with marbles ---------- */
+
+.glass-canvas {
+    display: block;
+    width: 100%;
+    max-width: 36rem;
+    height: clamp(230px, 40vh, 340px);
+    margin: 0.4rem auto 0.8rem;
+    border-radius: var(--radius);
+    border: 2px solid var(--glass-line);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.slider-row { display: flex; align-items: center; justify-content: center; gap: 0.9rem; width: 100%; max-width: 36rem; margin: 0.4rem auto; }
+.slider-row .emoji { font-size: 2.2rem; line-height: 1; }
+.temp-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    height: 1.1rem;
+    border-radius: 999px;
+    outline: none;
+    background: linear-gradient(90deg, #ef4444, #fb923c 32%, #a78bfa 64%, #60a5fa);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.35), 0 0 0 2px rgba(255, 255, 255, 0.35);
+    touch-action: none;
+}
+.temp-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 34% 30%, #fff, #fef3c7 60%, #fbbf24);
+    border: 3px solid #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+    cursor: grab;
+}
+.temp-slider::-moz-range-thumb {
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 34% 30%, #fff, #fef3c7 60%, #fbbf24);
+    border: 3px solid #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+    cursor: grab;
+}
+
+.tank-card { width: 100%; max-width: 42rem; padding: 0.9rem; }
+#particle-canvas-7 { display: block; width: 100%; height: clamp(320px, min(64vw, 60vh), 520px); }
+
+.state-chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.6rem;
+    margin: 0.9rem auto 0.2rem;
+    padding: 0.5rem 1.4rem;
+    border-radius: 999px;
+    background: var(--chip, var(--glass-strong));
+    font-size: clamp(1.15rem, 3.8vw, 1.5rem);
+    font-weight: 800;
+    text-align: center;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    transition: background 0.3s;
+}
+.state-solid { --chip: #2563eb; }
+.state-melting { --chip: #ea580c; }
+.state-liquid { --chip: #0891b2; }
+.state-gas { --chip: #7c3aed; }
+
+/* ---------- Pages 8-9: molecules ---------- */
+
+.mol-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(0.7rem, 2.5vw, 1.4rem);
+    width: 100%;
+    max-width: 60rem;
+    margin: 0.4rem auto 1rem;
+}
+@media (min-width: 900px) { .mol-grid { grid-template-columns: repeat(4, 1fr); } }
+.mol-card { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; padding: 1rem 0.6rem; }
+.mol-card h3 { font-size: clamp(1.1rem, 3.6vw, 1.4rem); font-weight: 800; }
+.mol-display { position: relative; width: clamp(6.5rem, 26vw, 9.5rem); height: clamp(6.5rem, 26vw, 9.5rem); }
+
+.compare { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(1rem, 4vw, 3rem); width: 100%; }
+.compare-col { display: flex; flex-direction: column; align-items: center; }
+.compare-col h3 { font-size: clamp(1.3rem, 4vw, 1.7rem); font-weight: 800; margin-bottom: 0.2rem; }
+
+/* ---------- Page 10: mysteries ---------- */
+
+.mystery-list { display: flex; flex-direction: column; gap: 0.9rem; width: 100%; max-width: 46rem; margin-bottom: 0.6rem; }
+.mystery-container {
+    border-radius: 1.4rem;
+    overflow: hidden;
+    background: var(--glass);
+    border: 2px solid var(--glass-line);
+    box-shadow: var(--shadow);
+}
+.mystery-note {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.05rem 1.4rem;
+    background: linear-gradient(90deg, var(--m1), var(--m2));
+    font-size: clamp(1.2rem, 3.8vw, 1.55rem);
+    font-weight: 800;
+    text-align: start;
+    cursor: pointer;
+    transition: filter 0.2s;
+    -webkit-tap-highlight-color: transparent;
+}
+.mystery-note h3 { font: inherit; }
+.mystery-note:hover { filter: brightness(1.1); }
+.mystery-note::after {
+    content: '＋';
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    font-size: 1.5rem;
+    transition: transform 0.3s;
+}
+.mystery-container.open .mystery-note::after { transform: rotate(135deg); }
+.answer {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 1.4rem;
+    text-align: start;
+    font-size: clamp(1.15rem, 3.5vw, 1.4rem);
+    line-height: 1.7;
+    transition: max-height 0.6s ease-in-out, padding 0.6s ease-in-out;
+}
+.answer.visible { max-height: 40rem; padding: 1.1rem 1.4rem 1.3rem; }
+
+/* ---------- Page 11: summary ---------- */
+
+.facts { display: grid; grid-template-columns: 1fr; gap: 1rem; width: 100%; max-width: 62rem; margin: 0.6rem auto 1.4rem; }
+@media (min-width: 900px) { .facts { grid-template-columns: repeat(3, 1fr); } }
+.fact { padding: 1.4rem 1rem; }
+.fact .icon { font-size: 3rem; line-height: 1; margin-bottom: 0.4rem; }
+.fact p { font-size: clamp(1.15rem, 3.6vw, 1.4rem); font-weight: 500; }
+.fact h3 {
+    margin-top: 0.3rem;
+    font-size: clamp(1.9rem, 6vw, 2.6rem);
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--f1), var(--f2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.25));
+}
+.confetti {
+    position: fixed;
+    top: -2rem;
+    z-index: 2;
+    font-size: 1.6rem;
+    pointer-events: none;
+    animation: confetti-fall linear forwards;
+}
+@keyframes confetti-fall {
+    to { transform: translateY(110vh) rotate(540deg); opacity: 0.9; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .step::before, .step::after, .bubble, .icon-tile, .btn-pulse, .title-hero { animation: none; }
 }
