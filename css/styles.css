@@ -5,6 +5,7 @@ body {
 /* Each page is mounted on its own and fades in once it has the .active class */
 .step {
     display: flex;
+    overflow-x: clip; /* nothing on a page may widen it, mobile browsers would zoom out to fit */
     min-height: 100vh;
     min-height: 100dvh;
     opacity: 0;

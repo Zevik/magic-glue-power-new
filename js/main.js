@@ -65,5 +65,31 @@ window.addEventListener('resize', () => {
     }, 250);
 });
 
+// The pages are inserted dynamically and Tailwind (loaded from its CDN) writes the CSS for their
+// classes a moment later. A page that measures its layout right away would see unstyled elements,
+// so before showing anything, all the classes of all the pages are handed to Tailwind at once and
+// we wait until it has produced the CSS.
+async function waitForTailwind() {
+    const classLists = new Set();
+    for (const page of pages) {
+        classLists.add(page.sectionClass);
+        for (const match of page.html.matchAll(/class="([^"]*)"/g)) classLists.add(match[1]);
+    }
+
+    const holder = document.createElement('div');
+    holder.setAttribute('aria-hidden', 'true');
+    holder.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;visibility:hidden;pointer-events:none;';
+    holder.innerHTML = [...classLists].map(classes => `<i class="${classes}"></i>`).join('') +
+        '<div class="w-48"></div>'; // once this one has a width, the CSS is in
+    const probe = holder.lastChild;
+    document.body.appendChild(holder); // stays, so Tailwind keeps the classes it generated
+
+    const start = performance.now();
+    while (getComputedStyle(probe).width !== '192px' && performance.now() - start < 3000) {
+        await new Promise(resolve => setTimeout(resolve, 16));
+    }
+}
+
+await waitForTailwind();
 window.addEventListener('hashchange', route);
 route();
