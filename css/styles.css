@@ -234,3 +234,52 @@ body {
     letter-spacing: 0.05em;
     white-space: nowrap;
 }
+
+/* Step 3: dragging specimens onto the microscope */
+#step-3-objects .interactive-object {
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+#step-3-objects .interactive-object.dragging {
+    opacity: 0.35;
+    transform: none;
+    filter: none;
+}
+.drag-ghost {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    margin: 0;
+    pointer-events: none;
+    transform-origin: 0 0;
+    filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.4));
+}
+#microscope-lens {
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+#microscope-lens.drop-ready {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 6px #facc15, 0 0 0 9px #111827, 0 0 50px rgba(250, 204, 21, 0.75);
+}
+#lens-hint {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: max-content;
+    top: 20%;
+    z-index: 6;
+    padding: 0.15rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    font-size: clamp(0.8rem, 2.6vw, 1rem);
+    font-weight: 700;
+    white-space: nowrap;
+    pointer-events: none;
+    animation: subtle-pulse 2.5s infinite ease-in-out;
+    transition: opacity 0.3s;
+}

@@ -7,7 +7,7 @@ export const sectionClass = 'flex-col justify-center items-center text-center bg
 
 export const html = `
 <h2 class="responsive-subtitle font-bold mb-2 sm:mb-4">המיקרוסקופ המטורף!</h2>
-<p class="max-w-3xl mx-auto responsive-text mb-4 sm:mb-6 px-4">לחצו על אחד החפצים כדי לראות איך הוא נראה בהגדלה של פי מאה מיליון!</p>
+<p class="max-w-3xl mx-auto responsive-text mb-4 sm:mb-6 px-4">גררו אחד החפצים אל המיקרוסקופ כדי לראות איך הוא נראה בהגדלה של פי מאה מיליון!</p>
 
 <div class="flex flex-col lg:flex-row w-full max-w-6xl gap-4 md:gap-8 items-stretch px-4">
     <!-- Left side: object selectors -->
@@ -41,6 +41,7 @@ export const html = `
                     <circle cx="50" cy="50" r="7" />
                 </svg>
             </div>
+            <div id="lens-hint">גררו חפץ לכאן</div>
             <div id="mag-readout" dir="ltr">×1</div>
         </div>
         <p id="particle-explanation" class="hidden w-full max-w-md p-3 sm:p-4 bg-white/10 text-white rounded-xl text-base sm:text-xl font-semibold text-center"></p>
@@ -82,9 +83,85 @@ export function init(page) {
     readout.textContent = formatMagnification(1);
     startFog();
 
-    root.querySelectorAll('[data-state]').forEach(item => {
-        item.addEventListener('click', () => showParticles(item.dataset.state), { signal: page.signal });
-    });
+    setupDragging();
+
+    // Drag a specimen onto the microscope. A plain tap works too: the specimen flies there by itself.
+    function setupDragging() {
+        const lens = root.querySelector('#microscope-lens');
+        const items = root.querySelectorAll('[data-state]');
+
+        page.signal.addEventListener('abort', () => {
+            document.querySelectorAll('.drag-ghost').forEach(ghost => ghost.remove());
+        });
+
+        const overLens = (x, y) => {
+            const box = lens.getBoundingClientRect();
+            return Math.hypot(x - (box.left + box.width / 2), y - (box.top + box.height / 2)) <= box.width / 2 * 1.05;
+        };
+
+        items.forEach(item => item.addEventListener('pointerdown', e => {
+            if (e.button > 0) return; // left mouse button, touch or pen only
+            e.preventDefault();
+
+            const svg = item.querySelector('svg');
+            const box = svg.getBoundingClientRect();
+            const grab = { x: e.clientX - box.left, y: e.clientY - box.top };
+            const origin = { x: e.clientX, y: e.clientY };
+            let moved = false;
+
+            const ghost = svg.cloneNode(true);
+            ghost.removeAttribute('class');
+            ghost.classList.add('drag-ghost');
+            ghost.style.width = `${box.width}px`;
+            ghost.style.height = `${box.height}px`;
+            document.body.appendChild(ghost);
+            item.classList.add('dragging');
+            try { item.setPointerCapture(e.pointerId); } catch { /* pointer already gone */ }
+
+            // The point you grabbed stays under the pointer, whatever the scale
+            const place = (x, y, scale) => {
+                ghost.style.transform = `translate(${x - grab.x * scale}px, ${y - grab.y * scale}px) scale(${scale})`;
+            };
+            place(e.clientX, e.clientY, 1.15);
+
+            const onMove = move => {
+                if (Math.hypot(move.clientX - origin.x, move.clientY - origin.y) > 6) moved = true;
+                place(move.clientX, move.clientY, 1.15);
+                lens.classList.toggle('drop-ready', overLens(move.clientX, move.clientY));
+            };
+
+            const finish = end => {
+                item.removeEventListener('pointermove', onMove);
+                item.removeEventListener('pointerup', finish);
+                item.removeEventListener('pointercancel', finish);
+                lens.classList.remove('drop-ready');
+                item.classList.remove('dragging');
+                ghost.style.transition = 'transform 0.35s cubic-bezier(0.3, 0.7, 0.3, 1), opacity 0.35s';
+
+                const dropped = end.type === 'pointerup' && (!moved || overLens(end.clientX, end.clientY));
+                if (dropped) {
+                    // Slide into the middle of the eyepiece, then start looking
+                    const lensBox = lens.getBoundingClientRect();
+                    const scale = 0.6;
+                    ghost.style.transform = `translate(${lensBox.left + lensBox.width / 2 - box.width * scale / 2}px, ${lensBox.top + lensBox.height / 2 - box.height * scale / 2}px) scale(${scale})`;
+                    ghost.style.opacity = '0';
+                    page.timeout(() => {
+                        ghost.remove();
+                        showParticles(item.dataset.state);
+                    }, 300);
+                } else {
+                    // Missed: it returns to where it came from
+                    const home = svg.getBoundingClientRect();
+                    place(home.left, home.top, 1);
+                    page.timeout(() => ghost.remove(), 350);
+                }
+            };
+
+            item.addEventListener('pointermove', onMove);
+            item.addEventListener('pointerup', finish);
+            item.addEventListener('pointercancel', finish);
+        }, { signal: page.signal }));
+    }
 
     // The slow fog you see before choosing something to look at
     function startFog() {
@@ -135,6 +212,7 @@ export function init(page) {
         const svg = zoomContainer.querySelector('svg');
         zoomContainer.classList.remove('hidden');
         readout.textContent = formatMagnification(1);
+        root.querySelector('#lens-hint').classList.add('hidden');
 
         root.querySelectorAll('#step-3-objects .interactive-object').forEach(el => el.classList.remove('active'));
         objectElement.classList.add('active');
