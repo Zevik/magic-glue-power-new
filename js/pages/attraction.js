@@ -50,6 +50,7 @@ function setupWaterInteraction(page, stiffness) {
 
     const m1 = createWaterMolecule('water1', width / 2, height / 2 - touching / 2, width);
     const m2 = createWaterMolecule('water2', home.x, home.y, width);
+    m2.classList.add('grab-handle');
     container.append(m1, m2);
 
     const damping = 0.9;
@@ -72,7 +73,7 @@ function setupWaterInteraction(page, stiffness) {
             vel.x = vel.y = angleVel = 0;
         },
         onEnd() { grab = null; }
-    });
+    }, [m2]); // only the molecule itself can be grabbed, the rest of the area still scrolls
 
     fixedStepLoop(page, () => {
         if (grab) return;
@@ -131,6 +132,7 @@ function setupOilInteraction(page, stiffness) {
             el: makeBall(i + 1)
         });
     }
+    nodes.forEach(n => n.el.classList.add('grab-handle'));
 
     let handle = null;   // the ball the user is holding
     let grab = null;     // where the pointer is relative to that ball
@@ -158,7 +160,7 @@ function setupOilInteraction(page, stiffness) {
             handle = null;
             for (const n of nodes) n.stuck = true; // it sticks again, and the chain snaps back
         }
-    });
+    }, nodes.map(n => n.el)); // only the chain itself can be grabbed, the rest of the area still scrolls
 
     function link(a, b, rest, strength) {
         const dx = b.x - a.x, dy = b.y - a.y;

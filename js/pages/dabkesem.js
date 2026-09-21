@@ -10,11 +10,11 @@ export const html = `
 <span class="kicker">🧲 שלב 4</span>
 <h2 class="title">כוח הדבקסם!</h2>
 <p class="callout">אבל למה הן נשארות יחד?</p>
-<p class="lead">זה הזמן להכיר את "כוח הדבקסם". הוא מושך את כל הגולות אחת אל השנייה. נסו להפריד בין שתי הגולות!</p>
+<p class="lead">זה הזמן להכיר את "כוח הדבקסם". הוא מושך את כל הגולות אחת אל השנייה. נסו להפריד בין שתי הגולות: תפסו את הכחולה ומשכו!</p>
 <div id="dabkesem-container" class="pull-area">
     <div id="dabkesem-line"></div>
     <div id="gula1" class="gula"></div>
-    <div id="gula2" class="gula"></div>
+    <div id="gula2" class="gula grab-handle"></div>
     <p id="dabkesem-text">מרגישים את המשיכה?</p>
 </div>
 <div class="actions">
@@ -44,6 +44,7 @@ export function init(page) {
     const pos2 = { ...attractionPoint };
     const vel2 = { x: 0, y: 0 };
     let dragging = false;
+    let grab = { x: 0, y: 0 }; // where the marble is relative to the finger, so it doesn't jump
 
     function updatePositions() {
         gula1.style.left = `${center.x - gula1.clientWidth / 2}px`;
@@ -63,22 +64,22 @@ export function init(page) {
         line.style.transform = `rotate(${angle}deg)`;
     }
 
+    // Only the blue marble can be grabbed, the rest of the area scrolls the page as usual
     bindDrag(page, container, {
         onStart(p) {
             dragging = true;
             text.style.opacity = '1';
-            pos2.x = p.x;
-            pos2.y = p.y;
+            grab = { x: pos2.x - p.x, y: pos2.y - p.y };
         },
         onMove(p) {
-            pos2.x = p.x;
-            pos2.y = p.y;
+            pos2.x = p.x + grab.x;
+            pos2.y = p.y + grab.y;
         },
         onEnd() {
             dragging = false;
             text.style.opacity = '0';
         }
-    });
+    }, [gula2]);
 
     updatePositions();
     page.frame(() => {

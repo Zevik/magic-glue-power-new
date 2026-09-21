@@ -5,8 +5,10 @@ export function pointerIn(container, e) {
     return { x: point.clientX - rect.left, y: point.clientY - rect.top };
 }
 
-// Mouse and touch dragging that starts on the container but keeps tracking outside of it.
-export function bindDrag(page, container, { onStart, onMove, onEnd }) {
+// Mouse and touch dragging that can only start on the given handles (by default the whole
+// container), but keeps tracking wherever the pointer goes. Keep handles small: touching
+// anywhere else on the page has to stay a normal scroll.
+export function bindDrag(page, container, { onStart, onMove, onEnd }, handles = [container]) {
     const { signal } = page;
     let dragging = false;
     const start = e => {
@@ -26,8 +28,10 @@ export function bindDrag(page, container, { onStart, onMove, onEnd }) {
         container.classList.remove('cursor-grabbing');
         onEnd();
     };
-    container.addEventListener('mousedown', start, { signal });
-    container.addEventListener('touchstart', start, { signal, passive: true });
+    handles.forEach(handle => {
+        handle.addEventListener('mousedown', start, { signal });
+        handle.addEventListener('touchstart', start, { signal, passive: true });
+    });
     window.addEventListener('mousemove', move, { signal });
     window.addEventListener('touchmove', move, { signal, passive: false });
     window.addEventListener('mouseup', end, { signal });

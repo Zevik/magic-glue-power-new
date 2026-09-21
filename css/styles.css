@@ -466,12 +466,16 @@ button { font-family: inherit; }
 
 /* ---------- Page 4: pulling two marbles ---------- */
 
+/* The things you can drag. touch-action: none only on them (plus a generous invisible margin),
+   so a finger anywhere else on the page still scrolls it. */
+.grab-handle { cursor: grab; touch-action: none; }
+.grab-handle::before { content: ''; position: absolute; inset: -0.9rem; }
+
+
 /* no box: just a soft glow to show where the marbles live */
 .pull-area, .mol-area {
     position: relative;
     margin: 0.6rem auto;
-    touch-action: none;
-    cursor: grab;
     background: radial-gradient(circle, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 62%);
 }
 .pull-area { width: min(26rem, 92vw); height: min(26rem, 92vw); }
@@ -531,7 +535,6 @@ button { font-family: inherit; }
     outline: none;
     background: linear-gradient(90deg, #ef4444, #fb923c 32%, #a78bfa 64%, #60a5fa);
     box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.35), 0 0 0 2px rgba(255, 255, 255, 0.35);
-    touch-action: none;
 }
 .temp-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
