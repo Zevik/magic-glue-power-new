@@ -12,7 +12,7 @@ export const reinitOnResize = true;
 export const sectionClass = 'theme-tsuronim';
 
 export const html = `
-<span class="kicker">🧬 שלב 8</span>
+<span class="kicker">🧬 שלב 9</span>
 <h2 class="title">הכירו את ה"צוּרוֹנִים"</h2>
 <p class="lead">עד עכשיו דיברנו על גולות, אבל יש עוד סוד קטן... לפעמים, כמה גולות נדבקות אחת לשנייה כל כך חזק, שהן יוצרות "גולת-על" משותפת! אנחנו נקרא לה "צוּרוֹן". לכל חומר יש צורון משלו, הנה כמה דוגמאות:</p>
 <div class="mol-grid">
@@ -35,7 +35,7 @@ export const html = `
 </div>
 <p class="callout callout-soft">אבל מה מחזיק את הצורונים האלה יחד?</p>
 <div class="actions">
-    <a href="#/states" class="btn btn-ghost">חזרה</a>
+    <a href="#/puddle" class="btn btn-ghost">חזרה</a>
     <a href="#/attraction" class="btn">בואו נגלה!</a>
 </div>
 `;

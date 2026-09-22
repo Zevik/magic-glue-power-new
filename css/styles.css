@@ -110,6 +110,9 @@ button { font-family: inherit; }
 .theme-tsuronim { --c1: #7e22ce; --c2: #be185d; --glow: #f9a8d4; }
 .theme-attraction { --c1: #5b21b6; --c2: #be123c; --glow: #fda4af; }
 .theme-mysteries { --c1: #b45309; --c2: #9f1239; --glow: #fde68a; }
+.theme-puddle { --c1: #0c4a6e; --c2: #1e3a8a; --glow: #7dd3fc; }
+.theme-reactions { --c1: #7c2d12; --c2: #18181b; --glow: #fb923c; }
+.theme-smell { --c1: #9d174d; --c2: #92400e; --glow: #fbcfe8; }
 .theme-summary { --c1: #047857; --c2: #1d4ed8; --glow: #a7f3d0; }
 
 /* ---------- Progress dots (each one is a link to its page) ---------- */
@@ -676,6 +679,39 @@ button { font-family: inherit; }
 @keyframes confetti-fall {
     to { transform: translateY(110vh) rotate(540deg); opacity: 0.9; }
 }
+
+/* ---------- Page: puddle ---------- */
+
+.wind-btn.on {
+    background: linear-gradient(180deg, #7dd3fc, #0ea5e9);
+    box-shadow: 0 6px 0 #0369a1, 0 14px 24px rgba(0, 0, 0, 0.32);
+    color: #062a3d;
+}
+
+/* ---------- Page: reactions ---------- */
+
+.reaction-stage {
+    position: relative;
+    width: 100%;
+    max-width: 40rem;
+    height: 14rem;
+    margin: 0.6rem auto 1rem;
+}
+
+/* ---------- Page: smell ---------- */
+
+.smell-stage { position: relative; width: 100%; max-width: 36rem; margin: 0 auto; }
+.smell-emoji {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: clamp(2.2rem, 9vw, 3.4rem);
+    z-index: 2;
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35));
+    transition: transform 0.15s ease;
+}
+.smell-cake { left: -0.4rem; }
+.smell-nose { right: -0.4rem; }
 
 @media (prefers-reduced-motion: reduce) {
     .step::before, .step::after, .bubble, .icon-tile, .btn-pulse, .title-hero { animation: none; }

@@ -4,7 +4,7 @@ export const title = 'פותרים את התעלומות';
 export const sectionClass = 'theme-mysteries';
 
 export const html = `
-<span class="kicker">🔎 שלב 10</span>
+<span class="kicker">🔎 שלב 11</span>
 <h2 class="title">פותרים את התעלומות</h2>
 <p class="lead">עכשיו, כשאתם מומחים לגולות, בואו נחזור לשאלות שהתחלנו איתן. לחצו על כל שאלה כדי לגלות את התשובה!</p>
 <div class="mystery-list">
@@ -24,10 +24,22 @@ export const html = `
         <div class="mystery-note" data-mystery="3" style="--m1: #ec4899; --m2: #a855f7;"><h3>למה טיפות מים כדוריות על מחבת שומנית?</h3></div>
         <div class="answer"><p>צורוני המים נמשכים חזק מאוד אחד לשני, אבל הם כמעט ולא נמשכים לצורונים של השמן. אז במקום "להימרח" על השמן, הם מעדיפים להידבק כמה שיותר חזק לעצמם, והצורה הכי טובה לעשות את זה היא... כדור!</p></div>
     </div>
+    <div class="mystery-container">
+        <div class="mystery-note" data-mystery="4" style="--m1: #22c55e; --m2: #0ea5e9;"><h3>למה גומייה קופצת בחזרה כשמותחים אותה?</h3></div>
+        <div class="answer"><p>כשמותחים גומייה, אתם מרחיקים את הצורונים הארוכים שלה זה מזה, נגד כוח הדבקסם שרוצה למשוך אותם בחזרה למקום. ברגע שאתם משחררים, כוח הדבקסם מנצח ומחזיר את כולם הביתה - וזה בדיוק מה שמרגיש כמו קפיצה.</p></div>
+    </div>
+    <div class="mystery-container">
+        <div class="mystery-note" data-mystery="5" style="--m1: #f97316; --m2: #dc2626;"><h3>למה קשה לכופף מזלג מתכת?</h3></div>
+        <div class="answer"><p>צורוני המתכת מסודרים בשורות צפופות, נעולות זו בזו בעזרת כוח דבקסם חזק מאוד. כדי לכופף את המזלג צריך לדחוף בכוח אדיר את כל השורות האלה למקום חדש - וגם אז חלק מהצורונים "מתגעגעים" למקום הישן ומנסים למשוך אותו בחזרה.</p></div>
+    </div>
+    <div class="mystery-container">
+        <div class="mystery-note" data-mystery="6" style="--m1: #a78bfa; --m2: #4338ca;"><h3>למה שומעים "קראק" כשמקל נשבר?</h3></div>
+        <div class="answer"><p>כשמכופפים מקל, מותחים יותר ויותר את הדבקסם שבין הצורונים שבצד החיצוני שלו, עד שהוא פשוט לא מחזיק מעמד ומשתחרר בבת אחת. כל השחרורים האלה ביחד יוצרים את הרעש שאתם שומעים.</p></div>
+    </div>
 </div>
 <div class="actions">
     <a href="#/attraction" class="btn btn-ghost">חזרה</a>
-    <a href="#/summary" class="btn">כל הכבוד! יש עוד משהו לדעת?</a>
+    <a href="#/reactions" class="btn">כל הכבוד! יש עוד משהו לדעת?</a>
 </div>
 `;
 

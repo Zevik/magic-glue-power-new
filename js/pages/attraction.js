@@ -8,7 +8,7 @@ export const reinitOnResize = true;
 export const sectionClass = 'theme-attraction';
 
 export const html = `
-<span class="kicker">🪢 שלב 9</span>
+<span class="kicker">🪢 שלב 10</span>
 <h2 class="title">משיכה בין צורונים</h2>
 <p class="lead">כמו מגנטים גדולים שנמשכים חזק יותר, כך גם צורונים גדולים ומסובכים נמשכים אחד לשני חזק יותר! זהו "כוח הדבקסם" שפועל ביניהם. נסו להפריד ביניהם!</p>
 <div class="compare">

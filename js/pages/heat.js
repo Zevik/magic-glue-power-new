@@ -16,6 +16,7 @@ export const html = `
     <input id="temp-slider-6" type="range" min="0" max="100" value="10" class="temp-slider" aria-label="טמפרטורה">
     <span class="emoji">☀️</span>
 </div>
+<p class="lead">וכך בדיוק עובד מדחום: הגולות המהירות שבחוץ "מכות" בו כל הזמן. ככל שהן מהירות יותר, הן דוחפות חזק יותר את הגולות שבתוך הצינורית הדקה שלו - וכשהגולות בפנים זזות יותר, הן תופסות יותר מקום ומטפסות למעלה!</p>
 <p class="callout callout-soft">זה כלל ממש חשוב: <b>חום = תנועה של גולות!</b> עכשיו אנחנו מוכנים לחבר את כל החלקים ולפתור את התעלומה הגדולה!</p>
 <div class="actions">
     <a href="#/air" class="btn btn-ghost">חזרה</a>

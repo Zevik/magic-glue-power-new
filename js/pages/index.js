@@ -7,9 +7,12 @@ import * as dabkesem from './dabkesem.js';
 import * as air from './air.js';
 import * as heat from './heat.js';
 import * as states from './states.js';
+import * as puddle from './puddle.js';
 import * as tsuronim from './tsuronim.js';
 import * as attraction from './attraction.js';
 import * as mysteries from './mysteries.js';
+import * as reactions from './reactions.js';
+import * as smell from './smell.js';
 import * as summary from './summary.js';
 
 export default [
@@ -21,8 +24,11 @@ export default [
     air,
     heat,
     states,
+    puddle,
     tsuronim,
     attraction,
     mysteries,
+    reactions,
+    smell,
     summary,
 ];

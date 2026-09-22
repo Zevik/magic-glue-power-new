@@ -4,7 +4,7 @@ export const title = 'השמות האמיתיים';
 export const sectionClass = 'theme-summary';
 
 export const html = `
-<span class="kicker">🏆 שלב 11</span>
+<span class="kicker">🏆 שלב 14</span>
 <h2 class="title">השמות האמיתיים</h2>
 <p class="lead">עברתם מסע מדהים וגיליתם את הסודות הגדולים ביותר של העולם! בואו נגלה לכם את השמות האמיתיים שהמדענים משתמשים בהם:</p>
 <div class="facts">
@@ -26,7 +26,7 @@ export const html = `
 </div>
 <p class="lead">עכשיו אתם לא רק יודעים איך העולם עובד, אתם גם יודעים לדבר כמו מדענים אמיתיים! תודה שהצטרפתם למסע!</p>
 <div class="actions">
-    <a href="#/mysteries" class="btn btn-ghost">חזרה</a>
+    <a href="#/smell" class="btn btn-ghost">חזרה</a>
     <a href="#/start" class="btn btn-big btn-pulse">לשחק שוב!</a>
 </div>
 `;
