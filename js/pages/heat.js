@@ -20,7 +20,7 @@ export const html = `
 <p class="callout callout-soft">זה כלל ממש חשוב: <b>חום = תנועה של גולות!</b> עכשיו אנחנו מוכנים לחבר את כל החלקים ולפתור את התעלומה הגדולה!</p>
 <div class="actions">
     <a href="#/air" class="btn btn-ghost">חזרה</a>
-    <a href="#/states" class="btn">אני מוכן!</a>
+    <a href="#/states" class="btn">אני רוצה לגלות!</a>
 </div>
 `;
 
