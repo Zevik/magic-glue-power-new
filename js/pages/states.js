@@ -22,7 +22,7 @@ export const html = `
 </div>
 <div class="actions">
     <a href="#/heat" class="btn btn-ghost">חזרה</a>
-    <a href="#/puddle" class="btn">רגע, למה שלוליות מתאדות בלי לרתוח?</a>
+    <a href="#/tsuronim" class="btn">הבנתי, מה זה צורון?</a>
 </div>
 `;
 

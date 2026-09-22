@@ -38,8 +38,8 @@ export const html = `
     </div>
 </div>
 <div class="actions">
-    <a href="#/attraction" class="btn btn-ghost">חזרה</a>
-    <a href="#/reactions" class="btn">כל הכבוד! יש עוד משהו לדעת?</a>
+    <a href="#/puddle" class="btn btn-ghost">חזרה</a>
+    <a href="#/reactions" class="btn">כל הכבוד! אבל נשאר סוד ענק אחד...</a>
 </div>
 `;
 

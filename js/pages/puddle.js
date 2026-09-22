@@ -9,16 +9,17 @@ export const reinitOnResize = true;
 export const sectionClass = 'theme-puddle';
 
 export const html = `
-<span class="kicker">💧 שלב 8</span>
+<span class="kicker">💧 שלב 10</span>
 <h2 class="title">תעלומת השלולית שנעלמה</h2>
-<p class="callout">אחרי הגשם, שלולית על המדרכה נעלמת מעצמה... אבל הרחוב לא רותח! איך?</p>
+<p class="callout">חזרו רגע לשאלה מהעולם האמיתי: אחרי הגשם, שלולית על המדרכה נעלמת מעצמה... אבל הרחוב לא רותח! איך?</p>
 <canvas id="particle-canvas-8-puddle" class="glass-canvas"></canvas>
 <p id="puddle-status" class="state-chip"></p>
 <button id="wind-btn" type="button" class="btn btn-ghost wind-btn">💨 תנו רוח!</button>
-<p class="lead">הצצה מבפנים: הגולות בשלולית מתנגשות כל הזמן. לפעמים כמה גולות דוחפות גולה אחת בדיוק באותו רגע, והיא מקבלת מספיק מהירות כדי לברוח לאוויר - זה "לוטו הגולות"! הרוח רק מפנה מקום לעוד גולות שרוצות לברוח.</p>
+<p class="lead">הצצה מבפנים: צורוני המים בשלולית מתנגשים כל הזמן. לפעמים כמה מהם דוחפים צורון אחד בדיוק באותו רגע, והוא מקבל מספיק מהירות כדי לנתק את כוח הדבקסם ולברוח לאוויר - זה "לוטו הצורונים"! הרוח רק מפנה מקום לעוד צורונים שרוצים לברוח.</p>
+<p class="callout callout-soft">עכשיו אתם כבר מומחים לצורונים ולכוח הדבקסם. מוכנים להפעיל את הידע הזה ולפתור עוד כמה תעלומות אמיתיות?</p>
 <div class="actions">
-    <a href="#/states" class="btn btn-ghost">חזרה</a>
-    <a href="#/tsuronim" class="btn">הבנתי, מה זה צורון?</a>
+    <a href="#/attraction" class="btn btn-ghost">חזרה</a>
+    <a href="#/mysteries" class="btn">בואו נפתור עוד תעלומות!</a>
 </div>
 `;
 
@@ -82,7 +83,7 @@ export function init(page) {
             status.textContent = 'השלולית התייבשה! ✨';
             status.style.setProperty('--chip', '#7c3aed');
         } else {
-            status.textContent = `💧 נשארו ${liquid.length} גולות בשלולית`;
+            status.textContent = `💧 נשארו ${liquid.length} צורונים בשלולית`;
             status.style.setProperty('--chip', '#0891b2');
         }
     }

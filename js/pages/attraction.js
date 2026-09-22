@@ -8,7 +8,7 @@ export const reinitOnResize = true;
 export const sectionClass = 'theme-attraction';
 
 export const html = `
-<span class="kicker">🪢 שלב 10</span>
+<span class="kicker">🪢 שלב 9</span>
 <h2 class="title">משיכה בין צורונים</h2>
 <p class="lead">כמו מגנטים גדולים שנמשכים חזק יותר, כך גם צורונים גדולים ומסובכים נמשכים אחד לשני חזק יותר! זהו "כוח הדבקסם" שפועל ביניהם. נסו להפריד ביניהם!</p>
 <div class="compare">
@@ -21,9 +21,10 @@ export const html = `
         <div id="molecule-container-oil" class="mol-area"></div>
     </div>
 </div>
+<p class="callout callout-soft">אז חלק מהצורונים נדבקים חזק כמו קליק, וחלק בקושי מרגישים זה את זה מרחוק... אז איך בכלל צורון בודד מצליח לפעמים "לברוח" מכולם?</p>
 <div class="actions">
     <a href="#/tsuronim" class="btn btn-ghost">חזרה</a>
-    <a href="#/mysteries" class="btn">וואו! בואו נפתור את התעלומות!</a>
+    <a href="#/puddle" class="btn">רגע, איך שלולית נעלמת בלי לרתוח?</a>
 </div>
 `;
 
