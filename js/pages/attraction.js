@@ -110,7 +110,7 @@ function setupOilInteraction(page, stiffness) {
     const xEnd = x0 + (count - 1) * spacing;
     const floorY = y1 + ballSize * 0.8; // the lowest edge of the fixed chain
 
-    const adhesion = stiffness * 0.3;    // how strongly a stuck ball is pulled back to where it sat
+    const adhesion = stiffness * 0.5;    // how strongly a stuck ball is pulled back to where it sat
     const damping = 0.9;
 
     function makeBall(i) {
@@ -129,7 +129,7 @@ function setupOilInteraction(page, stiffness) {
         nodes.push({
             ax, ay: y2, x: ax, y: y2, px: ax, py: y2,
             stuck: true,
-            breakAt: ballSize * (1.1 + Math.random() * 0.6), // some balls hold on longer than others
+            breakAt: ballSize * (1.6 + Math.random() * 1.2), // some balls hold on longer than others
             el: makeBall(i + 1)
         });
     }
@@ -187,8 +187,13 @@ function setupOilInteraction(page, stiffness) {
             }
         }
         if (handle) {
-            handle.x = handle.px = target.x;
-            handle.y = handle.py = target.y;
+            // while the ball you're holding is still stuck, it lags heavily behind your finger -
+            // it takes real effort to drag it. the moment it breaks free, it moves with you.
+            const resist = handle.stuck ? 0.06 : 0.85;
+            handle.x += (target.x - handle.x) * resist;
+            handle.y += (target.y - handle.y) * resist;
+            handle.px = handle.x;
+            handle.py = handle.y;
         }
 
         for (let iteration = 0; iteration < 12; iteration++) {
