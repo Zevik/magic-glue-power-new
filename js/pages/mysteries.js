@@ -4,7 +4,7 @@ export const title = 'פותרים את התעלומות';
 export const sectionClass = 'theme-mysteries';
 
 export const html = `
-<span class="kicker">🔎 שלב 11</span>
+<span class="kicker">🔎 שלב 10</span>
 <h2 class="title">פותרים את התעלומות</h2>
 <p class="lead">עכשיו, כשאתם מומחים לגולות, בואו נחזור לשאלות שהתחלנו איתן. לחצו על כל שאלה כדי לגלות את התשובה!</p>
 <div class="mystery-list">
@@ -38,7 +38,7 @@ export const html = `
     </div>
 </div>
 <div class="actions">
-    <a href="#/puddle" class="btn btn-ghost">חזרה</a>
+    <a href="#/attraction" class="btn btn-ghost">חזרה</a>
     <a href="#/reactions" class="btn">כל הכבוד! אבל נשאר סוד ענק אחד...</a>
 </div>
 `;

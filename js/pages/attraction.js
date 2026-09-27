@@ -21,10 +21,10 @@ export const html = `
         <div id="molecule-container-oil" class="mol-area"></div>
     </div>
 </div>
-<p class="callout callout-soft">אז חלק מהצורונים נדבקים חזק כמו קליק, וחלק בקושי מרגישים זה את זה מרחוק... אז איך בכלל צורון בודד מצליח לפעמים "לברוח" מכולם?</p>
+<p class="callout callout-soft">עכשיו אתם כבר מומחים לצורונים ולכוח הדבקסם. מוכנים להפעיל את הידע הזה ולפתור כמה תעלומות אמיתיות?</p>
 <div class="actions">
     <a href="#/tsuronim" class="btn btn-ghost">חזרה</a>
-    <a href="#/puddle" class="btn">רגע, איך שלולית נעלמת בלי לרתוח?</a>
+    <a href="#/mysteries" class="btn">בואו נפתור תעלומות!</a>
 </div>
 `;
 

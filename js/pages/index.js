@@ -26,9 +26,9 @@ export default [
     states,
     tsuronim,
     attraction,
-    puddle,
     mysteries,
     reactions,
+    puddle,
     smell,
     summary,
 ];

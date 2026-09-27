@@ -5,7 +5,7 @@ export const reinitOnResize = true;
 export const sectionClass = 'theme-reactions';
 
 export const html = `
-<span class="kicker">🔥 שלב 12</span>
+<span class="kicker">🔥 שלב 11</span>
 <h2 class="title">מהפכת הלגו</h2>
 <p class="lead">עד עכשיו רק הפרדנו צורונים שלמים זה מזה. מה קורה אם שוברים את ה"קליק" החזק שבונה את הצורון עצמו, ובונים ממנו צורון חדש לגמרי? זאת תגובה כימית. בואו נדליק גפרור ונשרוף קצת עץ!</p>
 <div id="reaction-stage" class="reaction-stage"></div>
@@ -30,7 +30,7 @@ export const html = `
 <p id="reaction-explain" class="callout callout-soft hidden">לא איבדנו אף גולה! פשוט פירקנו צורונים ישנים ובנינו מהם צורונים חדשים. זה הקסם שמאחורי אש, חלודה ואפייה.</p>
 <div class="actions">
     <a href="#/mysteries" class="btn btn-ghost">חזרה</a>
-    <a href="#/smell" class="btn">עוד קסם! איך זה שמריחים?</a>
+    <a href="#/puddle" class="btn">עוד קסם! איך שלולית נעלמת בלי לרתוח?</a>
 </div>
 `;
 

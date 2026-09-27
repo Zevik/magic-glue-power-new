@@ -23,7 +23,7 @@ export const html = `
 </div>
 <p class="callout callout-soft">ריח הוא לא קסם: כשאתם מריחים עוגה, צורונים אמיתיים שלה עפו כל הדרך עד האף שלכם! כל ריח בעולם הוא בעצם צורונים מעופפים שפוגעים בכם.</p>
 <div class="actions">
-    <a href="#/reactions" class="btn btn-ghost">חזרה</a>
+    <a href="#/puddle" class="btn btn-ghost">חזרה</a>
     <a href="#/summary" class="btn">מוכנים לגלות את השמות האמיתיים?</a>
 </div>
 `;

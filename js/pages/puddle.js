@@ -9,17 +9,17 @@ export const reinitOnResize = true;
 export const sectionClass = 'theme-puddle';
 
 export const html = `
-<span class="kicker">💧 שלב 10</span>
+<span class="kicker">💧 שלב 12</span>
 <h2 class="title">תעלומת השלולית שנעלמה</h2>
-<p class="callout">חזרו רגע לשאלה מהעולם האמיתי: אחרי הגשם, שלולית על המדרכה נעלמת מעצמה... אבל הרחוב לא רותח! איך?</p>
+<p class="callout">ועכשיו, בחזרה לצורונים שלמים ולעולם האמיתי: אחרי הגשם, שלולית על המדרכה נעלמת מעצמה... אבל הרחוב לא רותח! איך?</p>
 <canvas id="particle-canvas-8-puddle" class="glass-canvas"></canvas>
 <p id="puddle-status" class="state-chip"></p>
 <button id="wind-btn" type="button" class="btn btn-ghost wind-btn">💨 תנו רוח!</button>
 <p class="lead">הצצה מבפנים: צורוני המים בשלולית מתנגשים כל הזמן. לפעמים כמה מהם דוחפים צורון אחד בדיוק באותו רגע, והוא מקבל מספיק מהירות כדי לנתק את כוח הדבקסם ולברוח לאוויר - זה "לוטו הצורונים"! הרוח רק מפנה מקום לעוד צורונים שרוצים לברוח.</p>
-<p class="callout callout-soft">עכשיו אתם כבר מומחים לצורונים ולכוח הדבקסם. מוכנים להפעיל את הידע הזה ולפתור עוד כמה תעלומות אמיתיות?</p>
+<p class="callout callout-soft">אז צורונים יכולים לברוח לאוויר ולעוף לכל מקום... ומה קורה כשהם מגיעים עד האף שלכם?</p>
 <div class="actions">
-    <a href="#/attraction" class="btn btn-ghost">חזרה</a>
-    <a href="#/mysteries" class="btn">בואו נפתור עוד תעלומות!</a>
+    <a href="#/reactions" class="btn btn-ghost">חזרה</a>
+    <a href="#/smell" class="btn">בואו נריח!</a>
 </div>
 `;
 
