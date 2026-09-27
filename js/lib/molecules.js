@@ -30,7 +30,7 @@ export function createOilMolecule(id, x, y, containerWidth = 100, scaleOverride)
     molecule.style.position = 'absolute';
     const scale = scaleOverride ?? Math.min(1, containerWidth / 200);
     const numBalls = 14;
-    const ballSize = 10 * scale;
+    const ballSize = 8 * scale;
     const spacing = 7 * scale;
     molecule.style.width = `${(numBalls - 1) * spacing + ballSize}px`;
     molecule.style.height = `${ballSize}px`;
@@ -40,8 +40,7 @@ export function createOilMolecule(id, x, y, containerWidth = 100, scaleOverride)
 
     let chainHTML = '';
     for (let i = 0; i < numBalls; i++) {
-        const ballPixelSize = 3 * scale;
-        chainHTML += `<div class="marble ${i % 2 === 0 ? 'm-dark' : 'm-light'}" style="width: ${ballPixelSize * 4}px; height: ${ballPixelSize * 4}px; left: ${i * spacing}px;"></div>`;
+        chainHTML += `<div class="marble ${i % 2 === 0 ? 'm-dark' : 'm-light'}" style="width: ${ballSize}px; height: ${ballSize}px; left: ${i * spacing}px;"></div>`;
     }
     molecule.innerHTML = chainHTML;
     return molecule;
@@ -75,21 +74,23 @@ export function createSoapMolecule(id, x, y, containerWidth = 100, scaleOverride
     molecule.id = id;
     molecule.style.position = 'absolute';
     const scale = scaleOverride ?? Math.min(1, containerWidth / 200);
-    const numBalls = 7;
+    const numBalls = 14;
     const ballSize = 8 * scale;
-    const spacing = 6 * scale;
-    const headSize = 18 * scale;
-    molecule.style.width = `${headSize + (numBalls - 1) * spacing + ballSize}px`;
+    const spacing = 7 * scale;
+    const headSize = 16 * scale;
+    const tailStart = headSize - 4 * scale;
+    molecule.style.width = `${tailStart + (numBalls - 1) * spacing + ballSize}px`;
     molecule.style.height = `${headSize}px`;
     molecule.style.left = `${x}px`;
     molecule.style.top = `${y}px`;
     molecule.style.transform = 'translate(-50%, -50%)';
 
-    let chainHTML = `<div class="marble m-blue" style="width: ${4 * scale * 4}px; height: ${4 * scale * 4}px; left: 0; top: ${1 * scale}px;"></div>`;
+    let chainHTML = '';
     for (let i = 0; i < numBalls; i++) {
-        const tailBallSize = 2 * scale;
-        chainHTML += `<div class="marble m-green" style="width: ${tailBallSize * 4}px; height: ${tailBallSize * 4}px; left: ${headSize - 5 * scale + i * spacing}px; top: ${5 * scale}px;"></div>`;
+        chainHTML += `<div class="marble m-green" style="width: ${ballSize}px; height: ${ballSize}px; left: ${tailStart + i * spacing}px; top: ${(headSize - ballSize) / 2}px;"></div>`;
     }
+    // the head goes last so it sits on top of the start of the tail
+    chainHTML += `<div class="marble m-blue" style="width: ${headSize}px; height: ${headSize}px; left: 0; top: 0;"></div>`;
     molecule.innerHTML = chainHTML;
     return molecule;
 }

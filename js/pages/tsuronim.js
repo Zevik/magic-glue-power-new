@@ -43,9 +43,9 @@ export const html = `
 export function init(page) {
     // width of each molecule at scale 1, so it can be sized to fill about 85% of its box
     displayMolecule(page, 'display-water', createWaterMolecule, 60);
-    displayMolecule(page, 'display-oil', createOilMolecule, 101);
+    displayMolecule(page, 'display-oil', createOilMolecule, 99);
     displayMolecule(page, 'display-alcohol', createAlcoholMolecule, 50);
-    displayMolecule(page, 'display-soap', createSoapMolecule, 62);
+    displayMolecule(page, 'display-soap', createSoapMolecule, 111);
 }
 
 function displayMolecule(page, containerId, createFn, naturalWidth) {
