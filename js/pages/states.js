@@ -1,29 +1,36 @@
 import { smoothstep } from '../lib/util.js';
 import { marbleSprite, drawMarble } from '../lib/marble-sprite.js';
+import { icon as svg } from '../lib/icons.js';
+import { sfx } from '../lib/audio.js';
+import { discover } from '../lib/progress.js';
 
 export const slug = 'states';
 export const title = 'מסיבת הגולות הגדולה!';
+export const chapter = 'מסיבת הגולות';
+export const icon = 'snow';
+export const nextLabel = 'יש עוד סודות?';
 export const reinitOnResize = () => step7SizeChanged();
 
 export const sectionClass = 'theme-states';
 
 export const html = `
-<span class="kicker">🧊 שלב 7</span>
-<h2 class="title">מסיבת הגולות הגדולה!</h2>
-<p class="lead">עכשיו נראה איך הכל מתחבר ביחד. לפנינו מיכל מלא בגולות של מים. גררו את מד הטמפרטורה כדי להגביר את הלהבה שמתחת למיכל ולחמם את הגולות, ואז לקרר אותן שוב! שימו לב לחור הקטן בראש המיכל.</p>
+<h2 class="title">מסיבת הגולות <em>הגדולה</em></h2>
+<p class="lead">עכשיו מחברים הכול. במיכל יש גולות של מים, ומתחתיו להבה. גררו את הסליידר כדי לחמם או לקרר, ושימו לב לחור הקטן בראש המיכל.</p>
 <div class="card tank-card">
-    <canvas id="particle-canvas-7"></canvas>
+    <canvas id="particle-canvas-7" aria-label="מיכל עם גולות מים שמתחמם ומתקרר"></canvas>
     <div class="slider-row">
-        <span class="emoji">❄️</span>
+        <span class="cold">${svg('snow', { size: 32 })}</span>
         <input id="temp-slider-7" type="range" min="0" max="100" value="10" class="temp-slider" aria-label="טמפרטורה">
-        <span class="emoji">☀️</span>
+        <span class="hot">${svg('flame', { size: 32 })}</span>
     </div>
+    <div class="phases" id="phases" aria-hidden="true"><span data-p="solid">מוצק</span><span data-p="melting">נמס</span><span data-p="liquid">נוזל</span><span data-p="gas">גז</span></div>
     <p id="state-explanation" class="state-chip"></p>
 </div>
-<div class="actions">
-    <a href="#/heat" class="btn btn-ghost">חזרה</a>
-    <a href="#/tsuronim" class="btn">הבנתי! יש עוד סודות?</a>
-</div>
+<p class="insight" id="states-insight">שלושה מצבים, אותן גולות: <b>מוצק, נוזל וגז</b>. מה שמשתנה הוא רק כמה מהר הן זזות. קרח, מים ואדים הם אותו חומר בדיוק, עם אותו כוח דבקסם.</p>
+<details class="deep">
+    <summary>למבוגרים סקרנים</summary>
+    <p>בקרח המולקולות נעולות במבנה גבישי מסודר ורועדות סביב מקומן. במעבר לנוזל החום לא מעלה את הטמפרטורה אלא שובר קשרים (חום כמוס), ולכן הקרח נשאר על אפס מעלות בזמן שהוא נמס. ברתיחה צריך עוד יותר אנרגיה, כדי להפריד לגמרי בין המולקולות.</p>
+</details>
 `;
 
 // Lets the router skip re-setting-up the tank when the size did not really change
@@ -384,27 +391,53 @@ export function init(page) {
         }
     }
 
+    // soft puffs of steam, drawn from one pre-rendered cloud
+    const puff = document.createElement('canvas');
+    puff.width = puff.height = 64;
+    {
+        const g = puff.getContext('2d');
+        const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+        grad.addColorStop(0, 'rgba(240, 248, 255, 0.95)');
+        grad.addColorStop(0.5, 'rgba(226, 240, 255, 0.45)');
+        grad.addColorStop(1, 'rgba(226, 240, 255, 0)');
+        g.fillStyle = grad;
+        g.fillRect(0, 0, 64, 64);
+    }
+
     function drawSteam() {
-        ctx.fillStyle = 'rgb(226, 240, 255)';
         for (const s of steam) {
-            ctx.globalAlpha = s.life * 0.7;
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, r * (1 + (1 - s.life) * 0.8), 0, Math.PI * 2);
-            ctx.fill();
+            const size = r * (2.2 + (1 - s.life) * 3);
+            ctx.globalAlpha = Math.min(1, s.life * 0.9);
+            ctx.drawImage(puff, s.x - size, s.y - size, size * 2, size * 2);
         }
         ctx.globalAlpha = 1;
     }
 
+    const seenStates = new Set();
+    const phaseEls = [...document.querySelectorAll('#phases span')];
+    const insightEl = document.getElementById('states-insight');
+
     function updateExplanation(t) {
         let key, text;
-        if (t < MELT_FROM) { key = 'solid'; text = '🧊 זהו מצב מוצק! (קרח)'; }
-        else if (t < MELT_TO) { key = 'melting'; text = '🫨 הרעידות מתגברות והקרח מתחיל להימס!'; }
-        else if (t < 62) { key = 'liquid'; text = '💧 הקרח נמס! זהו מצב נוזל. (מים)'; }
-        else { key = 'gas'; text = '♨️ המים רותחים! זהו מצב גז. (אדים)'; }
+        if (t < MELT_FROM) { key = 'solid'; text = 'מוצק: הגולות נעולות במקום ורועדות'; }
+        else if (t < MELT_TO) { key = 'melting'; text = 'הרעידות מתגברות והקרח מתחיל להימס!'; }
+        else if (t < 62) { key = 'liquid'; text = 'נוזל: הגולות חופשיות להחליק זו על זו'; }
+        else { key = 'gas'; text = 'גז: אדים! הגולות עפות לכל כיוון'; }
         if (key === lastState) return;
+        const first = lastState === '';
         lastState = key;
         explanation.textContent = text;
         explanation.className = `state-chip state-${key}`;
+        phaseEls.forEach(el => el.classList.toggle('on', el.dataset.p === key));
+        if (first) return;
+        sfx.reveal();
+        seenStates.add(key);
+        if (key === 'liquid') discover('melt');
+        if (key === 'gas') discover('boil');
+        if (seenStates.has('liquid') && seenStates.has('gas')) {
+            insightEl.classList.add('show');
+            page.ready();
+        }
     }
 
     setup();

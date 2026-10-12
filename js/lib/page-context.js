@@ -1,9 +1,12 @@
+import { sfx } from './audio.js';
+
 // Everything a page starts (animation frames, timers, listeners) hangs off its context,
 // so leaving the page cleans all of it up in one call.
 export function createPageContext(root) {
     const controller = new AbortController();
     const stops = new Set();
     let alive = true;
+    let readyCalled = false;
 
     return {
         root,
@@ -37,6 +40,17 @@ export function createPageContext(root) {
             }, ms);
             stops.add(cancel);
             return cancel;
+        },
+
+        // The visitor has done what the page is about: the "next" button starts to glow.
+        // Nothing is ever locked, this is only a nudge.
+        ready() {
+            if (!alive) return;
+            const next = root.querySelector('.btn-next');
+            if (!next || next.classList.contains('ready')) return;
+            next.classList.add('ready');
+            if (!readyCalled) sfx.arrive();
+            readyCalled = true;
         },
 
         dispose() {

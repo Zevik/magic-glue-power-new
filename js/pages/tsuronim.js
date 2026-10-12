@@ -1,63 +1,74 @@
-import {
-    createWaterMolecule,
-    createOilMolecule,
-    createAlcoholMolecule,
-    createSoapMolecule
-} from '../lib/molecules.js';
+import { fitCanvas } from '../lib/canvas.js';
+import { createMolecule, MOLECULES } from '../lib/molecule3d.js';
+import { sfx } from '../lib/audio.js';
+import { discover } from '../lib/progress.js';
+import { burstAt } from '../lib/fx.js';
 
 export const slug = 'tsuronim';
 export const title = 'הכירו את הצורונים';
+export const chapter = 'הצורונים';
+export const icon = 'atoms';
+export const nextLabel = 'מה מחזיק אותם?';
 export const reinitOnResize = true;
 
 export const sectionClass = 'theme-tsuronim';
 
+const CARDS = [
+    { id: 'water', name: 'צורון של מים', note: 'שלוש גולות: אחת גדולה ושתיים קטנות, שמתחבקות בזווית.' },
+    { id: 'oil', name: 'צורון של שמן', note: 'שרשרת ארוכה ומתפתלת של ארבע־עשרה גולות.' },
+    { id: 'alcohol', name: 'צורון של אלכוהול', note: 'שלוש גולות בשורה קצרה וקומפקטית.' },
+    { id: 'soap', name: 'צורון של סבון', note: 'ראש כחול שאוהב מים, וזנב ארוך שבורח מהם.' }
+];
+
 export const html = `
-<span class="kicker">🧬 שלב 8</span>
-<h2 class="title">הכירו את ה"צוּרוֹנִים"</h2>
-<p class="lead">עד עכשיו דיברנו על גולות, אבל יש עוד סוד קטן... לפעמים, כמה גולות נדבקות אחת לשנייה כל כך חזק, שהן יוצרות "גולת-על" משותפת! אנחנו נקרא לה "צוּרוֹן". לכל חומר יש צורון משלו, הנה כמה דוגמאות:</p>
+<h2 class="title">הכירו את ה<em>צוּרוֹנִים</em></h2>
+<p class="lead">לפעמים כמה גולות נדבקות זו לזו כל כך חזק, שהן נהיות <b>גולת־על</b> אחת שלמה. קראנו לה <b>צורון</b>. לכל חומר יש צורון משלו. הגולות מפוזרות עכשיו, ותפקידכם להרכיב: לחצו על כל קלף.</p>
 <div class="mol-grid">
-    <div class="card mol-card">
-        <h3>צורון של מים</h3>
-        <div id="display-water" class="mol-display"></div>
-    </div>
-    <div class="card mol-card">
-        <h3>צורון של שמן</h3>
-        <div id="display-oil" class="mol-display"></div>
-    </div>
-    <div class="card mol-card">
-        <h3>צורון של אלכוהול</h3>
-        <div id="display-alcohol" class="mol-display"></div>
-    </div>
-    <div class="card mol-card">
-        <h3>צורון של סבון</h3>
-        <div id="display-soap" class="mol-display"></div>
-    </div>
+${CARDS.map(c => `    <button type="button" class="card mol-card" data-mol="${c.id}">
+        <h3>${c.name}</h3>
+        <canvas aria-label="${c.name}"></canvas>
+        <span class="mol-note">${c.note}</span>
+        <span class="mol-cta">לחצו להרכבה</span>
+    </button>`).join('\n')}
 </div>
-<p class="callout callout-soft">אבל מה מחזיק את הצורונים האלה יחד?</p>
-<div class="actions">
-    <a href="#/states" class="btn btn-ghost">חזרה</a>
-    <a href="#/attraction" class="btn">בואו נגלה!</a>
-</div>
+<p class="insight" id="tsuronim-insight">ארבעה חומרים, ארבעה צורונים. <b>הצורה של הצורון קובעת איך החומר מתנהג</b>: למה מים זורמים, שמן מחליק וסבון מנקה. אבל מה מחזיק את הגולות בתוך כל צורון ואת הצורונים זה לצד זה?</p>
+<details class="deep">
+    <summary>למבוגרים סקרנים</summary>
+    <p>מולקולת מים היא H<sub>2</sub>O: אטום חמצן ושני אטומי מימן בזווית של כ-104.5 מעלות. מולקולת סבון היא "דו־פנים": ראש הידרופילי שנמשך למים וזנב הידרופובי שנמשך לשומן, ולכן סבון מצליח לתפוס שומן ולהתיר אותו במים.</p>
+</details>
 `;
 
 export function init(page) {
-    // width of each molecule at scale 1, so it can be sized to fill about 85% of its box
-    displayMolecule(page, 'display-water', createWaterMolecule, 60);
-    displayMolecule(page, 'display-oil', createOilMolecule, 99);
-    displayMolecule(page, 'display-alcohol', createAlcoholMolecule, 50);
-    displayMolecule(page, 'display-soap', createSoapMolecule, 111);
-}
+    const cards = [...page.root.querySelectorAll('.mol-card')];
+    const insight = page.root.querySelector('#tsuronim-insight');
 
-function displayMolecule(page, containerId, createFn, naturalWidth) {
-    const container = page.root.querySelector(`#${containerId}`);
-    container.innerHTML = '';
-    const scale = container.clientWidth * 0.85 / naturalWidth;
-    const molecule = createFn(`${containerId}-mol`, container.clientWidth / 2, container.clientHeight / 2, container.clientWidth, scale);
-    container.appendChild(molecule);
+    const mols = cards.map(card => {
+        const canvas = card.querySelector('canvas');
+        const view = fitCanvas(canvas);
+        const mol = createMolecule(canvas, MOLECULES[card.dataset.mol], view);
+        card.addEventListener('click', () => {
+            if (mol.built) return;
+            mol.build(performance.now());
+            sfx.whoosh();
+            page.timeout(() => {
+                sfx.snap();
+                card.classList.add('built');
+                card.querySelector('.mol-cta').textContent = 'הורכב!';
+                burstAt(card, { count: 16 });
+                if (mols.every(m => m.mol.built)) {
+                    discover('build');
+                    insight.classList.add('show');
+                    page.ready();
+                }
+            }, 520);
+        }, { signal: page.signal });
+        return { mol, view };
+    });
 
-    let angle = 0;
-    page.frame(() => {
-        angle += 0.2;
-        molecule.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+    page.frame(now => {
+        for (const { mol, view } of mols) {
+            view.ctx.clearRect(0, 0, view.W, view.H);
+            mol.draw(now);
+        }
     });
 }

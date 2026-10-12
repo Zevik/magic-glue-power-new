@@ -1,66 +1,67 @@
-import { marbleSprite, drawMarble } from '../lib/marble-sprite.js';
+import { marbleSprite, drawMarble, drawGlow } from '../lib/marble-sprite.js';
 import { fixedStepLoop } from '../lib/interaction.js';
+import { fitCanvas, TAU, rand } from '../lib/canvas.js';
 import { clamp } from '../lib/util.js';
+import { icon as svg } from '../lib/icons.js';
+import { sfx } from '../lib/audio.js';
+import { discover } from '../lib/progress.js';
 
 export const slug = 'puddle';
 export const title = 'תעלומת השלולית שנעלמה';
+export const chapter = 'השלולית שנעלמה';
+export const icon = 'drop';
+export const nextLabel = 'בואו נריח!';
 export const reinitOnResize = true;
 
 export const sectionClass = 'theme-puddle';
 
 export const html = `
-<span class="kicker">💧 שלב 12</span>
-<h2 class="title">תעלומת השלולית שנעלמה</h2>
-<p class="callout">ועכשיו, בחזרה לצורונים שלמים ולעולם האמיתי: אחרי הגשם, שלולית על המדרכה נעלמת מעצמה... אבל הרחוב לא רותח! איך?</p>
-<canvas id="particle-canvas-8-puddle" class="glass-canvas"></canvas>
+<h2 class="title">לאן נעלמה <em>השלולית</em>?</h2>
+<p class="lead">אחרי הגשם נשארה שלולית על המדרכה. כמה שעות אחר כך היא נעלמה, אבל הרחוב לא רתח! אז איך מים נעלמים בלי להרתיח?</p>
+<canvas id="particle-canvas-8-puddle" class="glass-canvas" aria-label="שלולית שהגולות שלה בורחות אחת־אחת לאוויר"></canvas>
 <p id="puddle-status" class="state-chip"></p>
-<button id="wind-btn" type="button" class="btn btn-ghost wind-btn">💨 תנו רוח!</button>
-<p class="lead">הצצה מבפנים: צורוני המים בשלולית מתנגשים כל הזמן. לפעמים כמה מהם דוחפים צורון אחד בדיוק באותו רגע, והוא מקבל מספיק מהירות כדי לנתק את כוח הדבקסם ולברוח לאוויר - זה "לוטו הצורונים"! הרוח רק מפנה מקום לעוד צורונים שרוצים לברוח.</p>
-<p class="callout callout-soft">אז צורונים יכולים לברוח לאוויר ולעוף לכל מקום... ומה קורה כשהם מגיעים עד האף שלכם?</p>
-<div class="actions">
-    <a href="#/reactions" class="btn btn-ghost">חזרה</a>
-    <a href="#/smell" class="btn">בואו נריח!</a>
-</div>
+<div class="btn-row"><button id="wind-btn" type="button" class="btn btn-ghost btn-small wind-btn">${svg('wind', { size: 22 })}<span>תנו רוח</span></button></div>
+<p class="insight" id="puddle-insight">זה <b>לוטו הצורונים</b>: הגולות בשלולית מתנגשות כל הזמן. לפעמים כמה מהן דוחפות גולה אחת בדיוק באותו רגע, והיא מקבלת מספיק מהירות כדי להתנתק מהדבקסם ולברוח לאוויר. הרוח רק מפנה מקום לעוד גולות שרוצות לברוח.</p>
+<details class="deep">
+    <summary>למבוגרים סקרנים</summary>
+    <p>זה אידוי: המהירויות של המולקולות בנוזל מתפלגות סביב ממוצע, ותמיד יש מעטות מהירות מאוד. אלה שנמצאות סמוך לפני השטח ומהירות מספיק, בורחות. כשהן עוזבות, הן לוקחות איתן אנרגיה, ולכן הנוזל שנשאר מתקרר. כך גם הזיעה מקררת אותנו.</p>
+</details>
 `;
 
-const INITIAL_COUNT = 42;
+const INITIAL_COUNT = 64;
 const BASE_ESCAPE_P = 0.006;
 const WIND_ESCAPE_P = 0.02;
 const SURFACE_CANDIDATES = 4;
 
 export function init(page) {
     const canvas = page.root.querySelector('#particle-canvas-8-puddle');
-    const ctx = canvas.getContext('2d');
     const status = page.root.querySelector('#puddle-status');
     const windBtn = page.root.querySelector('#wind-btn');
-
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-
-    // in case init() runs again after a resize, put the wind button back to its default look
-    windBtn.classList.remove('on');
-    windBtn.textContent = '💨 תנו רוח!';
+    const insight = page.root.querySelector('#puddle-insight');
+    const { ctx, W, H, dpr } = fitCanvas(canvas);
 
     let windOn = false;
     windBtn.addEventListener('click', () => {
         windOn = !windOn;
         windBtn.classList.toggle('on', windOn);
-        windBtn.textContent = windOn ? '💨 הרוח נושבת!' : '💨 תנו רוח!';
+        windBtn.querySelector('span').textContent = windOn ? 'הרוח נושבת' : 'תנו רוח';
+        sfx.whoosh();
     }, { signal: page.signal });
 
-    const r = Math.max(6, Math.min(9, canvas.width / 46));
+    const r = Math.max(6, Math.min(9, W / 46));
     const minD = r * 1.9;
     const cohesionD = r * 2.8;
-    const sprite = marbleSprite(198, 85, 55, r);
-    const steamSprite = marbleSprite(198, 40, 85, r * 0.8);
+    const sprite = marbleSprite(198, 85, 55, r, dpr);
 
-    const puddleW = canvas.width * 0.82;
-    const puddleLeft = (canvas.width - puddleW) / 2;
-    const puddleBottom = canvas.height - r * 1.5;
-    const puddleTop = canvas.height * 0.45;
+    const puddleW = W * 0.82;
+    const puddleLeft = (W - puddleW) / 2;
+    const puddleBottom = H - r * 1.5 - 6;
+    const puddleTop = H * 0.45;
 
     let liquid = [];
     let steam = [];
+    let ripples = [];
+    let dried = false;
 
     function spawnPuddle() {
         liquid = [];
@@ -80,14 +81,27 @@ export function init(page) {
 
     function updateStatus() {
         if (liquid.length === 0) {
-            status.textContent = 'השלולית התייבשה! ✨';
+            status.textContent = 'השלולית התייבשה!';
             status.style.setProperty('--chip', '#7c3aed');
         } else {
-            status.textContent = `💧 נשארו ${liquid.length} צורונים בשלולית`;
+            status.textContent = `נשארו ${liquid.length} גולות בשלולית`;
             status.style.setProperty('--chip', '#0891b2');
         }
     }
     updateStatus();
+
+    let windPhase = 0;
+    const puff = (() => {
+        const c = document.createElement('canvas');
+        c.width = c.height = 48;
+        const g = c.getContext('2d');
+        const grad = g.createRadialGradient(24, 24, 0, 24, 24, 24);
+        grad.addColorStop(0, 'rgba(235, 247, 255, 0.9)');
+        grad.addColorStop(1, 'rgba(235, 247, 255, 0)');
+        g.fillStyle = grad;
+        g.fillRect(0, 0, 48, 48);
+        return c;
+    })();
 
     fixedStepLoop(page, () => {
         liquid.forEach(p => {
@@ -132,28 +146,94 @@ export function init(page) {
             surface.forEach(candidate => {
                 if (Math.random() < escapeP) {
                     liquid.splice(liquid.indexOf(candidate), 1);
-                    steam.push({ x: candidate.x, y: candidate.y, vx: (Math.random() - 0.5) * 1.2, vy: -(1.2 + Math.random() * 1.4), opacity: 1 });
+                    steam.push({ x: candidate.x, y: candidate.y, vx: windOn ? rand(0.4, 1.8) : rand(-0.6, 0.6), vy: -(1.2 + Math.random() * 1.4), opacity: 1 });
+                    ripples.push({ x: candidate.x, y: candidate.y, t: 0 });
+                    sfx.ping(liquid.length % 8);
                     escaped = true;
                 }
             });
             if (escaped) updateStatus();
             if (liquid.length === 0) {
-                page.timeout(() => { spawnPuddle(); updateStatus(); }, 3000);
+                if (!dried) {
+                    dried = true;
+                    discover('puddle');
+                    insight.classList.add('show');
+                    page.ready();
+                }
+                page.timeout(() => { spawnPuddle(); updateStatus(); }, 3500);
             }
         }
 
         steam.forEach(s => {
             s.vy -= 0.012;
-            s.x += s.vx;
+            s.x += s.vx + (windOn ? 0.6 : 0);
             s.y += s.vy;
             s.opacity -= 0.007;
         });
         steam = steam.filter(s => s.opacity > 0 && s.y > -r * 3);
+        ripples.forEach(rp => { rp.t += 0.04; });
+        ripples = ripples.filter(rp => rp.t < 1);
+        windPhase += windOn ? 0.03 : 0;
     }, () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, W, H);
+
+        // sun
+        const sunX = W * 0.86, sunY = H * 0.16;
+        drawGlow(ctx, sunX, sunY, 26, 45, 0.8);
+        ctx.save();
+        ctx.translate(sunX, sunY);
+        ctx.rotate(performance.now() / 6000);
+        ctx.strokeStyle = 'rgba(255, 235, 150, 0.55)';
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        for (let i = 0; i < 12; i++) {
+            ctx.rotate(TAU / 12);
+            ctx.beginPath(); ctx.moveTo(26, 0); ctx.lineTo(i % 2 ? 36 : 42, 0); ctx.stroke();
+        }
+        ctx.restore();
+        ctx.fillStyle = '#fff3b0';
+        ctx.beginPath(); ctx.arc(sunX, sunY, 17, 0, TAU); ctx.fill();
+
+        // the pavement under the puddle
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+        ctx.beginPath();
+        ctx.roundRect(puddleLeft - 12, puddleBottom - 2, puddleW + 24, H - puddleBottom + 2, [0, 0, 18, 18]);
+        ctx.fill();
+
+        // wind streaks
+        if (windOn) {
+            ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            for (let i = 0; i < 7; i++) {
+                const y = H * (0.12 + i * 0.1);
+                const x = ((windPhase * 140 + i * 97) % (W + 120)) - 60;
+                ctx.beginPath(); ctx.moveTo(x, y); ctx.bezierCurveTo(x + 24, y - 6, x + 44, y + 6, x + 70, y); ctx.stroke();
+            }
+        }
+
+        // a gentle sheen on the water
+        if (liquid.length > 0) {
+            const g = ctx.createLinearGradient(0, puddleTop, 0, puddleBottom);
+            g.addColorStop(0, 'rgba(125, 211, 252, 0.2)');
+            g.addColorStop(1, 'rgba(125, 211, 252, 0.06)');
+            ctx.fillStyle = g;
+            const surfaceY = Math.min(...liquid.map(p => p.y)) - r;
+            ctx.beginPath();
+            ctx.roundRect(puddleLeft, surfaceY, puddleW, puddleBottom - surfaceY, 18);
+            ctx.fill();
+        }
+
+        for (const rp of ripples) {
+            ctx.strokeStyle = `rgba(255,255,255,${(1 - rp.t) * 0.8})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(rp.x, rp.y, r + rp.t * 26, 0, TAU); ctx.stroke();
+        }
+
         steam.forEach(s => {
+            const size = r * (1.6 + (1 - s.opacity) * 2.2);
             ctx.globalAlpha = clamp(s.opacity, 0, 1);
-            drawMarble(ctx, steamSprite, s.x, s.y, r * 0.8);
+            ctx.drawImage(puff, s.x - size, s.y - size, size * 2, size * 2);
         });
         ctx.globalAlpha = 1;
         liquid.forEach(p => drawMarble(ctx, sprite, p.x, p.y, r));
