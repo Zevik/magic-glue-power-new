@@ -3,7 +3,6 @@ import { fixedStepLoop } from '../lib/interaction.js';
 import { marbleSprite, drawMarble, drawGlow, drawShadow } from '../lib/marble-sprite.js';
 import { sfx } from '../lib/audio.js';
 import { discover } from '../lib/progress.js';
-import { ring } from '../lib/fx.js';
 
 export const slug = 'dabkesem';
 export const title = 'כוח הדבקסם!';
@@ -20,10 +19,10 @@ export const html = `
 <div class="stage pull-stage"><canvas id="pull-canvas" aria-label="שתי גולות. אפשר לגרור את הכחולה"></canvas></div>
 <div class="meter"><span class="meter-label">עוצמת המשיכה</span><div class="meter-track"><div class="meter-fill" id="pull-meter"></div></div></div>
 <p class="hint" id="pull-hint">גררו את הגולה הכחולה</p>
-<p class="insight" id="pull-insight">הרגשתם? <b>ככל שמרחיקים, המשיכה חזקה יותר, עד נקודה מסוימת</b>, ואם מרחיקים הרבה מדי, הגולה יוצאת מהטווח וחופשית. כוח הדבקסם חזק, אבל הוא פועל רק בקרבה.</p>
+<p class="insight" id="pull-insight">הרגשתם? <b>ככל שמרחיקים את הגולה, הדבקסם מושך חזק יותר</b>, ומיד כשעוזבים היא חוזרת הביתה. זה הכוח שמחזיק גולות יחד.</p>
 <details class="deep">
     <summary>למבוגרים סקרנים</summary>
-    <p>בין אטומים ומולקולות פועלים כוחות חשמליים: משיכה בין מטענים מנוגדים, דחייה בין זהים. מרחוק הם כמעט מתבטלים, ובמרחק של כמה אטומים הם מחזיקים חומר שלם. הכוח האלקטרומגנטי הזה הוא ה"דבקסם" שלנו, ויש לו טווח אפקטיבי קצר מאוד.</p>
+    <p>בין אטומים ומולקולות פועלים כוחות חשמליים: משיכה בין מטענים מנוגדים, דחייה בין זהים. הכוח האלקטרומגנטי הזה הוא ה"דבקסם" שלנו, והוא מחזיק חומר שלם יחד. קל לדמות אותו לקפיץ: ככל שמותחים יותר, הוא מושך חזק יותר.</p>
 </details>
 `;
 
@@ -38,15 +37,13 @@ export function init(page) {
     const C = { x: W / 2, y: H / 2 };
     const home = { x: C.x + R * 2.02, y: C.y };
     const dHome = home.x - C.x;
-    const DMAX = W / 2 - R * 1.2;               // beyond here the marble leaves the force's range (reachable inside the canvas)
-    const D0 = dHome + (DMAX - dHome) * 0.45;   // up to here the pull gets stronger as you stretch
+    const DMAX = W / 2 - R * 1.2;               // the farthest the marble can be dragged inside the canvas
     const pos = { ...home };
     const vel = { x: 0, y: 0 };
     let grab = null;
     let last = { x: 0, y: 0 };
     let throwV = { x: 0, y: 0 };
     let stretchedFar = false;
-    let outOfRange = false;
     let done = false;
     let lastSoundAt = 0;
     let tetherPulse = 0;
@@ -56,8 +53,8 @@ export function init(page) {
     const blue = marbleSprite(217, 90, 55, R, dpr);
 
     const dist = () => Math.hypot(pos.x - C.x, pos.y - C.y);
-    // 0..1: how strongly the pull acts at this distance
-    const strength = d => d <= D0 ? d / D0 : Math.max(0, 1 - (d - D0) / (DMAX - D0));
+    // 0..1: how strongly the pull acts at this distance. It never lets go: the farther, the stronger.
+    const strength = d => Math.min(1, Math.max(0.15, d / DMAX));
 
     bindCanvasDrag(page, canvas, {
         hit: p => Math.hypot(p.x - pos.x, p.y - pos.y) < R * 1.6,
@@ -74,24 +71,16 @@ export function init(page) {
             throwV = { x: p.x - last.x, y: p.y - last.y };
             last = { x: p.x, y: p.y };
             const d = dist();
-            if (d > D0 * 0.85) stretchedFar = true;
+            if (d > dHome + (DMAX - dHome) * 0.5) stretchedFar = true;
             const now = performance.now();
             if (now - lastSoundAt > 70) { sfx.stretch(Math.min(1, d / DMAX)); lastSoundAt = now; }
-            if (d > DMAX && !outOfRange) {
-                outOfRange = true;
-                sfx.snap();
-                tetherPulse = 1;
-                const b = canvas.getBoundingClientRect();
-                ring(b.left + C.x, b.top + C.y, { color: 'rgba(253, 224, 71, 0.9)', max: 110 });
-                hint.textContent = 'הגולה יצאה מטווח הדבקסם!';
-            }
         },
         onEnd() {
             grab = null;
-            vel.x = throwV.x * 0.5;
-            vel.y = throwV.y * 0.5;
-            if (dist() <= DMAX) { sfx.snap(); }
-            hint.textContent = dist() > DMAX ? 'היא חופשית. קרבו אותה בחזרה כדי שהדבקסם יתפוס אותה' : 'גררו שוב, ונסו להרחיק עוד';
+            vel.x = throwV.x * 0.3;
+            vel.y = throwV.y * 0.3;
+            sfx.snap();
+            hint.textContent = 'ראו איך היא חוזרת? גררו שוב, ונסו להרחיק עוד';
         }
     });
 
@@ -99,17 +88,10 @@ export function init(page) {
         t++;
         tetherPulse *= 0.92;
         if (grab) return;
-        const d = dist();
-        const s = strength(d);
-        if (s > 0) {
-            const k = 0.07 * s;
-            vel.x += (home.x - pos.x) * k;
-            vel.y += (home.y - pos.y) * k;
-            vel.x *= 0.88; vel.y *= 0.88;
-            if (outOfRange && d < DMAX * 0.92) { outOfRange = false; sfx.click(5); }
-        } else {
-            vel.x *= 0.985; vel.y *= 0.985;
-        }
+        const k = 0.07 * strength(dist());
+        vel.x += (home.x - pos.x) * k;
+        vel.y += (home.y - pos.y) * k;
+        vel.x *= 0.88; vel.y *= 0.88;
         pos.x += vel.x; pos.y += vel.y;
         pos.x = Math.min(W - R, Math.max(R, pos.x));
         pos.y = Math.min(H - R, Math.max(R, pos.y));
@@ -127,19 +109,10 @@ export function init(page) {
         const d = dist();
         const s = strength(d);
         // the meter shows how hard the pull is: nothing at rest, strongest at full stretch, fading outside the range
-        const pull = d <= D0 ? Math.max(0, (d - dHome) / (D0 - dHome)) : s;
+        const pull = Math.max(0, (d - dHome) / (DMAX - dHome));
         meter.style.transform = `scaleX(${Math.min(1, pull).toFixed(3)})`;
 
         ctx.clearRect(0, 0, W, H);
-
-        // faint range rings: how far the force reaches
-        ctx.setLineDash([4, 10]);
-        ctx.strokeStyle = 'rgba(255,255,255,0.14)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(C.x, C.y, DMAX, 0, TAU);
-        ctx.stroke();
-        ctx.setLineDash([]);
 
         drawShadow(ctx, C.x, C.y + R * 1.05, R, 0.4);
         drawShadow(ctx, pos.x, pos.y + R * 1.05, R, 0.4);
@@ -152,7 +125,7 @@ export function init(page) {
             const ex = pos.x - Math.cos(ang) * R * 0.9, ey = pos.y - Math.sin(ang) * R * 0.9;
             const len = Math.hypot(ex - sx, ey - sy);
             const nx = -Math.sin(ang), ny = Math.cos(ang);
-            const alpha = outOfRange ? 0 : 0.35 + s * 0.65;
+            const alpha = 0.35 + s * 0.65;
             if (alpha > 0.02 && len > 2) {
                 ctx.globalCompositeOperation = 'lighter';
                 for (let strand = 0; strand < 3; strand++) {
